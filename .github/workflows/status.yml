@@ -1,1 +1,91 @@
+name: Open Data Status
 
+# Every 30 minutes: checks how up to date the MeteoSwiss OGD collections are on the FSDI
+# STAC API, keeps the history on the branch `monitor-data` and deploys the page together
+# with the fresh data to GitHub Pages. Also runs on every push to main and by hand.
+#
+# The branch `monitor-data` is rewritten as a single commit on every run (force push),
+# so its git history does not grow. Do not protect this branch.
+# On the very first run (branch missing) the history starts from the files in seed/.
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: open-data-status
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPO_URL: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch previous history
+        run: |
+          mkdir -p data
+          if git ls-remote --exit-code --heads "$REPO_URL" monitor-data > /dev/null; then
+            git clone --depth 1 --branch monitor-data "$REPO_URL" prev
+            cp prev/history.json prev/history_items.json data/ 2>/dev/null || true
+          elif [ -f seed/history.json ]; then
+            echo "No branch monitor-data yet: starting from seed/"
+            cp seed/history.json seed/history_items.json data/
+          fi
+
+      - name: Run check
+        run: python3 scripts/ogd_monitor.py --config config.json --data data
+
+      - name: Publish history to branch monitor-data
+        working-directory: data
+        run: |
+          cat > README.md <<'TXT'
+          Data branch of Open Data Status. Written automatically by .github/workflows/status.yml
+          on main; rewritten as a single commit on every run. Do not edit by hand.
+          TXT
+          git init -q -b monitor-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md status.json history.json history_items.json
+          git commit -q -m "Open Data Status check $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push -q --force "$REPO_URL" monitor-data
+          rm -rf .git README.md
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build page
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          cp data/*.json dist/data/
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
