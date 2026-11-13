@@ -27,3 +27,12 @@ h1 { font-size: 32px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.01em
 .footer strong { color: #202224; }
 .monitor table { border-collapse: collapse; width: 100%; }
 .monitor th, .monitor td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid #e1e5e8; font-size: 14px; }
+
+@media (max-width: 650px) {
+  main.page { padding-top: 20px; }
+  h1 { font-size: 26px; }
+  .beta { font-size: 11px; margin-left: 6px; }
+  .intro { font-size: 15px; margin-bottom: 18px; }
+  .footer { font-size: 13px; }
+  .footer nav a, .footer nav strong { padding: 6px 2px; }
+}

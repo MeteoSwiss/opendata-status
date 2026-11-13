@@ -262,6 +262,13 @@ function Strip({checks, end, firstEver, t}) {
 
 // ---------- main component ----------
 
+// Split a status line at " · " so that each part wraps as a whole on narrow screens.
+function segments(text) {
+  return text.split(' · ').map((part, i) => (
+    <React.Fragment key={i}>{i > 0 && ' '}<span className={styles.seg}>{i > 0 && '· '}{part}</span></React.Fragment>
+  ));
+}
+
 export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, refreshMinutes = 5}) {
   const t = strings(locale);
   const name = (c) => c.name[locale] || c.name.en;
@@ -430,11 +437,11 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
                   {r.c.monitoring_pending
                     ? <p className={styles.pending}>{t.pending}</p>
                     : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t} />}
-                  <p className={styles.statLine}>{r.c.metric === 'latency'
+                  <p className={styles.statLine}>{segments(r.c.metric === 'latency'
                     ? t.latLine(r.value === null || r.value === undefined ? '–' : fmtAge(r.value, t), fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
                       + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
                       + (r.stalled ? ` · ${t.noNewData}` : '')
-                    : t.line(t.interval[r.c.interval], fmtTime(r.m.updated, t), fmtAge(r.value, t))}</p>
+                    : t.line(t.interval[r.c.interval], fmtTime(r.m.updated, t), fmtAge(r.value, t)))}</p>
                 </div>
               ))}
             </div>
