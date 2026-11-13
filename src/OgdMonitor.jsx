@@ -262,6 +262,15 @@ function Strip({checks, end, firstEver, t}) {
 
 // ---------- main component ----------
 
+// Group to open for a deep link: #group-D or #monitor-<item key>
+function groupFromHash() {
+  if (typeof window === 'undefined') return [];
+  const h = decodeURIComponent(window.location.hash.slice(1));
+  if (h.startsWith('group-')) return [h.slice(6)];
+  const item = config.items.find((c) => `monitor-${c.key}` === h);
+  return item ? [item.group] : [];
+}
+
 // Split a status line at " · " so that each part wraps as a whole on narrow screens.
 function segments(text) {
   return text.split(' · ').map((part, i) => (
@@ -275,6 +284,17 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
 
   const [live, setLive] = useState(null); // {checked: Date, m: {key: measurement|undefined}}
   const [history, setHistory] = useState(null); // {summary: [], items: []} or {error}
+  const [openGroups, setOpenGroups] = useState(() => new Set(groupFromHash()));
+  const toggleGroup = (g) => setOpenGroups((prev) => {
+    const next = new Set(prev);
+    if (next.has(g)) next.delete(g); else next.add(g);
+    return next;
+  });
+  useEffect(() => {
+    const onHash = () => setOpenGroups((prev) => new Set([...prev, ...groupFromHash()]));
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   const loadLive = useCallback(async () => {
     pending.clear();
@@ -314,6 +334,15 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
       return {c, m: m || {}, value: res.value, stalled: res.stalled, cls};
     });
   }, [live]);
+
+  // deep link: once the data are there, scroll to the opened group or dataset
+  const scrolled = useRef(false);
+  useEffect(() => {
+    if (!rows || scrolled.current || !window.location.hash) return;
+    scrolled.current = true;
+    const el = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+    if (el) requestAnimationFrame(() => el.scrollIntoView());
+  }, [rows]);
 
   if (!rows) return <p className={styles.loading}>{t.loading}</p>;
 
@@ -370,6 +399,54 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     return pts;
   };
 
+  const renderItem = (r) => (
+      <div key={r.c.key} className={r.c.sub ? `${styles.service} ${styles.sub}` : styles.service} id={`monitor-${r.c.key}`}>
+        <div className={styles.row}>
+          <div className={styles.name}>
+            {r.c.doc ? <a href={docUrl(r.c.doc, locale)}>{name(r.c)}</a> : name(r.c)}
+            <small>{r.c.collection.replace('ch.meteoschweiz.', '')}</small>
+          </div>
+          <span className={`${styles.status} ${styles[r.cls]}`}>{statusText(r.cls)}</span>
+        </div>
+        {r.c.monitoring_pending
+          ? <p className={styles.pending}>{t.pending}</p>
+          : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t} />}
+        <p className={styles.statLine}>{segments(r.c.metric === 'latency'
+          ? t.latLine(r.value === null || r.value === undefined ? '–' : fmtAge(r.value, t), fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
+            + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
+            + (r.stalled ? ` · ${t.noNewData}` : '')
+          : t.line(t.interval[r.c.interval], fmtTime(r.m.updated, t), fmtAge(r.value, t)))}</p>
+      </div>
+  );
+
+  // group strip: per check, green if all datasets of the group were up to date, red if none, else orange
+  const groupChecks = (list) => {
+    const byKey = new Map(list.map((r) => [r.c.key, r]));
+    const byTime = new Map();
+    for (const p of hist.items) {
+      if (!byKey.has(p.key)) continue;
+      if (!byTime.has(p.checked)) byTime.set(p.checked, []);
+      byTime.get(p.checked).push(p);
+    }
+    const summarize = (n, okN, off, when) => ({
+      cls: okN === n ? 'ok' : okN === 0 ? 'bad' : 'warn',
+      text: `${t.ofCurrent(okN, n)} (${when})${off.length ? ` · ${off.join(', ')}` : ''}`,
+    });
+    const pts = [...byTime].map(([checked, ps]) => ({
+      t: new Date(checked),
+      ...summarize(ps.length, ps.filter((p) => p.status === 'ok').length,
+        ps.filter((p) => p.status !== 'ok').map((p) => `${name(byKey.get(p.key).c)}: ${t.status[p.status] || p.status}`),
+        `${t.check} ${fmtClock(checked, t)}`),
+    }));
+    pts.push({
+      t: live.checked,
+      ...summarize(list.length, nOk(list),
+        list.filter((r) => r.cls !== 'ok').map((r) => `${name(r.c)}: ${t.status[r.cls]}`),
+        `${t.live} ${fmtClock(live.checked, t)}`),
+    });
+    return pts;
+  };
+
   return (
     <div className={styles.monitor}>
       <div className={styles.headline}>
@@ -377,6 +454,59 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         <div>
           <p className={styles.hlTitle}>{title}</p>
           <p className={styles.muted}>{t.lead(rtOk, realtime.length, fmtTime(live.checked, t, true))}</p>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <p className={styles.h2}>{t.overview}</p>
+        <p className={`${styles.small} ${styles.sub2}`}>{t.overviewSub}</p>
+        {history && history.error && <p className={styles.notice}>{t.historyMissing}</p>}
+        <div className={styles.bars}>
+          <div className={styles.bar}>
+            <div className={styles.row}>
+              <div className={styles.barTitle}>
+                <span className={styles.barName}>{t.realtime}</span>
+                <small>{t.rtScope}</small>
+              </div>
+              <span className={`${styles.status} ${styles[rtCls]}`}>{rtCls === 'ok' ? t.allCurrent : t.ofCurrent(rtOk, realtime.length)}</span>
+            </div>
+            <Strip checks={rtChecks} end={live.checked} firstEver={firstEver} t={t} />
+          </div>
+          {GROUPS.map((g) => {
+            // order as in config.json (= order of the documentation)
+            const list = rows.filter((r) => r.c.group === g && r.cls !== 'static');
+            if (!list.length) {
+              return (
+                <div key={g} className={styles.bar} id={`group-${g}`}>
+                  <div className={styles.barTitle}>
+                    <span className={`${styles.barName} ${styles.muted}`}>{t.groups[g]}</span>
+                    <small>{t.noneYet}</small>
+                  </div>
+                </div>
+              );
+            }
+            const ok = nOk(list);
+            const cls = ok === list.length ? 'ok' : ok === 0 ? 'bad' : 'warn';
+            const open = openGroups.has(g);
+            return (
+              <div key={g} className={styles.bar} id={`group-${g}`}>
+                <div className={styles.row}>
+                  <button type="button" className={styles.toggle} aria-expanded={open} aria-controls={`group-${g}-list`} onClick={() => toggleGroup(g)}>
+                    <span className={styles.chev} aria-hidden="true" />
+                    <span className={styles.barTitle}>
+                      <span className={styles.barName}>{t.groups[g]}</span>
+                      <small>{t.nSets(list.length)}</small>
+                    </span>
+                  </button>
+                  <span className={`${styles.status} ${styles[cls]}`}>{cls === 'ok' ? t.allCurrent : t.ofCurrent(ok, list.length)}</span>
+                </div>
+                <Strip checks={groupChecks(list)} end={live.checked} firstEver={firstEver} t={t} />
+                <div id={`group-${g}-list`} className={styles.groupList} hidden={!open}>
+                  {list.map(renderItem)}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -404,49 +534,6 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
             <span className={styles.small}>{t.kpiBadSub}</span>
           </div>
         </div>
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.row}>
-          <p className={styles.h2} style={{margin: 0}}>{t.realtime}</p>
-          <span className={`${styles.status} ${styles[rtCls]}`}>{rtCls === 'ok' ? t.allCurrent : t.ofCurrent(rtOk, realtime.length)}</span>
-        </div>
-        <p className={styles.small} style={{marginTop: 6}}>{t.realtimeSub}</p>
-        {history && history.error && <p className={styles.notice}>{t.historyMissing}</p>}
-        <Strip checks={rtChecks} end={live.checked} firstEver={firstEver} t={t} />
-      </div>
-
-      <div className={styles.section}>
-        <p className={styles.h2}>{t.datasets}</p>
-        {GROUPS.map((g) => {
-          // order as in config.json (= order of the documentation)
-          const list = rows.filter((r) => r.c.group === g && r.cls !== 'static');
-          return (
-            <div key={g} className={styles.group}>
-              <p className={styles.h3}>{t.groups[g]}</p>
-              {!list.length && <p className={styles.small}>{t.noneYet}</p>}
-              {list.map((r) => (
-                <div key={r.c.key} className={r.c.sub ? `${styles.service} ${styles.sub}` : styles.service} id={`monitor-${r.c.key}`}>
-                  <div className={styles.row}>
-                    <div className={styles.name}>
-                      {r.c.doc ? <a href={docUrl(r.c.doc, locale)}>{name(r.c)}</a> : name(r.c)}
-                      <small>{r.c.collection.replace('ch.meteoschweiz.', '')}</small>
-                    </div>
-                    <span className={`${styles.status} ${styles[r.cls]}`}>{statusText(r.cls)}</span>
-                  </div>
-                  {r.c.monitoring_pending
-                    ? <p className={styles.pending}>{t.pending}</p>
-                    : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t} />}
-                  <p className={styles.statLine}>{segments(r.c.metric === 'latency'
-                    ? t.latLine(r.value === null || r.value === undefined ? '–' : fmtAge(r.value, t), fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
-                      + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
-                      + (r.stalled ? ` · ${t.noNewData}` : '')
-                    : t.line(t.interval[r.c.interval], fmtTime(r.m.updated, t), fmtAge(r.value, t)))}</p>
-                </div>
-              ))}
-            </div>
-          );
-        })}
       </div>
 
       <details className={styles.details}>

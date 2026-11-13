@@ -187,6 +187,60 @@
 .legend span { display: inline-flex; align-items: center; gap: 8px; }
 .swatch { width: 14px; height: 14px; border-radius: 1px; display: inline-block; background: var(--m-empty); }
 
+/* overview: one bar for the real-time datasets and one per group; groups open to their datasets */
+.sub2 { margin: -12px 0 6px !important; }
+.bars { display: grid; }
+.bar { padding: 18px 0; }
+.bar + .bar { border-top: 1px solid var(--m-line); }
+.bar:last-child { padding-bottom: 0; }
+/* time axis only once, under the first bar */
+.bar + .bar .labels { display: none; }
+
+.barTitle { display: grid; min-width: 0; }
+.barTitle small { font-size: 13px; color: var(--m-muted); font-weight: 400; }
+.barName { font-size: 17px; font-weight: 600; line-height: 1.35; }
+
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin: -6px 0 -6px -6px;
+  padding: 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+@media (hover: hover) { .toggle:hover .barName { text-decoration: underline; text-underline-offset: 4px; } }
+.toggle:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 0; }
+
+.chev {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-top: 7px;
+  border-right: 2px solid var(--m-ink);
+  border-bottom: 2px solid var(--m-ink);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+.toggle[aria-expanded="true"] .chev { transform: rotate(45deg); margin-top: 4px; }
+
+.groupList {
+  margin-top: 18px;
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid var(--m-line);
+}
+.groupList[hidden] { display: none; }
+.groupList .labels { display: none; }
+.groupList .strip { height: 18px; }
+
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+
 /* state colors, per element type */
 .bigdot.ok, .bin.ok, .swatch.ok, .status.ok::before { background: var(--m-green); }
 .bigdot.warn, .bin.warn, .swatch.warn, .status.warn::before { background: var(--m-amber); }
@@ -224,8 +278,10 @@
 
   .history { margin-top: 8px; }
   .strip { height: 20px; gap: 1px; }
-  /* time axis once on the real-time strip, not repeated per data set */
-  .service .labels { display: none; }
+  .bar { padding: 14px 0; }
+  .barName { font-size: 16px; }
+  .groupList { margin-top: 14px; padding-left: 12px; }
+  .groupList .strip { height: 16px; }
   .statLine { font-size: 12.5px; margin-top: 6px !important; line-height: 1.45; }
   .pop { top: 28px; }
 
