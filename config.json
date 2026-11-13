@@ -1,0 +1,468 @@
+{
+ "description": "Configuration of the OGD monitor, shared by scripts/monitor/ogd_monitor.py and src/components/OgdMonitor. One entry per monitored product. metric 'age': minutes since the collection's newest item was updated; metric 'latency': publication latency in minutes, i.e. time from the data's reference time (timestamp in the file name, or newest reference_timestamp in a *_now.csv) to its availability (asset creation on the STAC API, or the file's Last-Modified). ok_max_min: up to this counts as up to date; warn_max_min: up to this counts as delayed, beyond as down. For latency entries, a product also counts as down when its newest reference time is older than interval_min + warn_max_min (no new data). null thresholds = static, not monitored. realtime: counts towards OKR O3-KR1. The order of items is the display order (as in the documentation); sub: true marks a single station shown under its collection. doc: path of the documentation page (without locale); null = title without link. monitoring_pending: true shows 'monitoring to follow' instead of the history strip. source.complete_run: true measures latency until the last file of a model run is available (all parameters), not the first.",
+ "stac_api": "https://data.geo.admin.ch/api/stac/v1",
+ "items": [
+  {
+   "key": "smn",
+   "collection": "ch.meteoschweiz.ogd-smn",
+   "group": "A",
+   "metric": "age",
+   "interval": "10min",
+   "ok_max_min": 20,
+   "warn_max_min": 60,
+   "realtime": true,
+   "name": {
+    "en": "Automatic weather stations",
+    "de": "Automatische Wetterstationen",
+    "fr": "Stations météorologiques automatiques",
+    "it": "Stazioni meteorologiche automatiche"
+   },
+   "doc": "/a-data-groundbased/a1-automatic-weather-stations"
+  },
+  {
+   "key": "smn-klo",
+   "collection": "ch.meteoschweiz.ogd-smn",
+   "group": "A",
+   "metric": "latency",
+   "source": {
+    "kind": "station_now_csv",
+    "station": "klo"
+   },
+   "interval": "10min",
+   "interval_min": 10,
+   "ok_max_min": 15,
+   "warn_max_min": 45,
+   "realtime": false,
+   "name": {
+    "en": "Station: Zurich / Kloten (KLO)",
+    "de": "Station: Zürich / Kloten (KLO)",
+    "fr": "Station : Zurich / Kloten (KLO)",
+    "it": "Stazione: Zurigo / Kloten (KLO)"
+   },
+   "sub": true,
+   "doc": null
+  },
+  {
+   "key": "smn-precip",
+   "collection": "ch.meteoschweiz.ogd-smn-precip",
+   "group": "A",
+   "metric": "age",
+   "interval": "10min",
+   "ok_max_min": 20,
+   "warn_max_min": 60,
+   "realtime": true,
+   "name": {
+    "en": "Automatic precipitation stations",
+    "de": "Automatische Niederschlagsstationen",
+    "fr": "Stations pluviométriques automatiques",
+    "it": "Stazioni pluviometriche automatiche"
+   },
+   "doc": "/a-data-groundbased/a2-automatic-precipitation-stations"
+  },
+  {
+   "key": "smn-precip-win",
+   "collection": "ch.meteoschweiz.ogd-smn-precip",
+   "group": "A",
+   "metric": "latency",
+   "source": {
+    "kind": "station_now_csv",
+    "station": "win"
+   },
+   "interval": "10min",
+   "interval_min": 10,
+   "ok_max_min": 20,
+   "warn_max_min": 60,
+   "realtime": false,
+   "name": {
+    "en": "Station: Winterthur / Seen (WIN)",
+    "de": "Station: Winterthur / Seen (WIN)",
+    "fr": "Station : Winterthour / Seen (WIN)",
+    "it": "Stazione: Winterthur / Seen (WIN)"
+   },
+   "sub": true,
+   "doc": null
+  },
+  {
+   "key": "smn-tower",
+   "collection": "ch.meteoschweiz.ogd-smn-tower",
+   "group": "A",
+   "metric": "age",
+   "interval": "10min",
+   "ok_max_min": 20,
+   "warn_max_min": 60,
+   "realtime": true,
+   "name": {
+    "en": "Automatic tower stations",
+    "de": "Automatische Turmstationen",
+    "fr": "Stations automatiques sur tour",
+    "it": "Stazioni automatiche su torre"
+   },
+   "doc": "/a-data-groundbased/a3-automatic-tower-stations"
+  },
+  {
+   "key": "nime",
+   "collection": "ch.meteoschweiz.ogd-nime",
+   "group": "A",
+   "metric": "age",
+   "interval": "daily",
+   "ok_max_min": 1560,
+   "warn_max_min": 3000,
+   "realtime": false,
+   "name": {
+    "en": "Manual precipitation stations",
+    "de": "Manuelle Niederschlagsstationen",
+    "fr": "Stations pluviométriques manuelles",
+    "it": "Stazioni pluviometriche manuali"
+   },
+   "doc": "/a-data-groundbased/a5-manual-precipitation-stations"
+  },
+  {
+   "key": "tot",
+   "collection": "ch.meteoschweiz.ogd-tot",
+   "group": "A",
+   "metric": "age",
+   "interval": "yearly",
+   "ok_max_min": 576000,
+   "warn_max_min": 1152000,
+   "realtime": false,
+   "name": {
+    "en": "Totaliser precipitation stations",
+    "de": "Totalisatoren",
+    "fr": "Totalisateurs",
+    "it": "Totalizzatori"
+   },
+   "doc": "/a-data-groundbased/a6-totaliser-precipitation-stations"
+  },
+  {
+   "key": "pollen",
+   "collection": "ch.meteoschweiz.ogd-pollen",
+   "group": "A",
+   "metric": "latency",
+   "source": {
+    "kind": "station_now_csv",
+    "station": "latest",
+    "suffix": "h_now"
+   },
+   "interval": "hourly",
+   "interval_min": 60,
+   "ok_max_min": 60,
+   "warn_max_min": 180,
+   "realtime": false,
+   "name": {
+    "en": "Pollen stations",
+    "de": "Pollenstationen",
+    "fr": "Stations de mesure du pollen",
+    "it": "Stazioni di misura dei pollini"
+   },
+   "doc": "/a-data-groundbased/a7-pollen-stations"
+  },
+  {
+   "key": "obs",
+   "collection": "ch.meteoschweiz.ogd-obs",
+   "group": "A",
+   "metric": "age",
+   "interval": "daily",
+   "ok_max_min": 1560,
+   "warn_max_min": 3000,
+   "realtime": false,
+   "name": {
+    "en": "Visual observations",
+    "de": "Augenbeobachtungen",
+    "fr": "Observations visuelles",
+    "it": "Osservazioni visive"
+   },
+   "doc": "/a-data-groundbased/a8-meteorological-visual-observations"
+  },
+  {
+   "key": "phenology",
+   "collection": "ch.meteoschweiz.ogd-phenology",
+   "group": "A",
+   "metric": "age",
+   "interval": "weekly",
+   "ok_max_min": 11520,
+   "warn_max_min": 21600,
+   "realtime": false,
+   "name": {
+    "en": "Phenological observations",
+    "de": "Phänologische Beobachtungen",
+    "fr": "Observations phénologiques",
+    "it": "Osservazioni fenologiche"
+   },
+   "doc": "/a-data-groundbased/a9-phenological-observations"
+  },
+  {
+   "key": "nbcn",
+   "collection": "ch.meteoschweiz.ogd-nbcn",
+   "group": "C",
+   "metric": "age",
+   "interval": "monthly",
+   "ok_max_min": 50400,
+   "warn_max_min": 89280,
+   "realtime": false,
+   "name": {
+    "en": "Climate stations, homogeneous series",
+    "de": "Klimastationen, homogene Reihen",
+    "fr": "Stations climatologiques, séries homogènes",
+    "it": "Stazioni climatologiche, serie omogenee"
+   },
+   "doc": "/c-climate-data/c1-climate-stations_homogeneous"
+  },
+  {
+   "key": "nbcn-precip",
+   "collection": "ch.meteoschweiz.ogd-nbcn-precip",
+   "group": "C",
+   "metric": "age",
+   "interval": "monthly",
+   "ok_max_min": 50400,
+   "warn_max_min": 89280,
+   "realtime": false,
+   "name": {
+    "en": "Climate precipitation stations, homogeneous series",
+    "de": "Klima-Niederschlagsstationen, homogene Reihen",
+    "fr": "Stations pluviométriques climatologiques, séries homogènes",
+    "it": "Stazioni pluviometriche climatologiche, serie omogenee"
+   },
+   "doc": "/c-climate-data/c2-climate-percipitation-stations_homogeneous"
+  },
+  {
+   "key": "surface-derived-grid",
+   "collection": "ch.meteoschweiz.ogd-surface-derived-grid",
+   "group": "C",
+   "metric": "age",
+   "interval": "daily",
+   "ok_max_min": 1560,
+   "warn_max_min": 3000,
+   "realtime": false,
+   "name": {
+    "en": "Spatial climate analyses: precipitation, temperature, sunshine",
+    "de": "Räumliche Klimaanalysen: Niederschlag, Temperatur, Sonne",
+    "fr": "Analyses climatologiques spatiales : précipitations, température, ensoleillement",
+    "it": "Analisi climatologiche spaziali: precipitazioni, temperatura, soleggiamento"
+   },
+   "doc": "/c-climate-data/c3-ground-based-climate-data"
+  },
+  {
+   "key": "satellite-derived-grid",
+   "collection": "ch.meteoschweiz.ogd-satellite-derived-grid",
+   "group": "C",
+   "metric": "age",
+   "interval": "daily",
+   "ok_max_min": 1560,
+   "warn_max_min": 3000,
+   "realtime": false,
+   "name": {
+    "en": "Spatial climate analyses: radiation, clouds",
+    "de": "Räumliche Klimaanalysen: Strahlung, Bewölkung",
+    "fr": "Analyses climatologiques spatiales : rayonnement, nébulosité",
+    "it": "Analisi climatologiche spaziali: radiazione, nuvolosità"
+   },
+   "doc": "/c-climate-data/c4-satellite-based-climate-data"
+  },
+  {
+   "key": "radar-derived-grid",
+   "collection": "ch.meteoschweiz.ogd-radar-derived-grid",
+   "group": "C",
+   "metric": "age",
+   "interval": "monthly",
+   "ok_max_min": 50400,
+   "warn_max_min": 89280,
+   "realtime": false,
+   "name": {
+    "en": "Spatial climate analyses: hail",
+    "de": "Räumliche Klimaanalysen: Hagel",
+    "fr": "Analyses climatologiques spatiales : grêle",
+    "it": "Analisi climatologiche spaziali: grandine"
+   },
+   "doc": "/c-climate-data/c5-radar-based-climate-data"
+  },
+  {
+   "key": "climate-normals-grid",
+   "collection": "ch.meteoschweiz.ogd-climate-normals-grid",
+   "group": "C",
+   "metric": "age",
+   "interval": "static",
+   "ok_max_min": null,
+   "warn_max_min": null,
+   "realtime": false,
+   "name": {
+    "en": "Climate normals, gridded",
+    "de": "Klimanormwerte, räumlich",
+    "fr": "Normes climatologiques, grille",
+    "it": "Norme climatologiche, griglia"
+   },
+   "doc": "/c-climate-data/c7-spatial-climate-normals"
+  },
+  {
+   "key": "climate-scenarios-ch2025",
+   "collection": "ch.meteoschweiz.ogd-climate-scenarios-ch2025",
+   "group": "C",
+   "metric": "age",
+   "interval": "static",
+   "ok_max_min": null,
+   "warn_max_min": null,
+   "realtime": false,
+   "name": {
+    "en": "Climate scenarios CH2025, stations",
+    "de": "Klimaszenarien CH2025, Stationen",
+    "fr": "Scénarios climatiques CH2025, stations",
+    "it": "Scenari climatici CH2025, stazioni"
+   },
+   "doc": "/c-climate-data/c8-c9-climate-scenarios"
+  },
+  {
+   "key": "climate-scenarios-ch2025-grid",
+   "collection": "ch.meteoschweiz.ogd-climate-scenarios-ch2025-grid",
+   "group": "C",
+   "metric": "age",
+   "interval": "static",
+   "ok_max_min": null,
+   "warn_max_min": null,
+   "realtime": false,
+   "name": {
+    "en": "Climate scenarios CH2025, gridded",
+    "de": "Klimaszenarien CH2025, Gitter",
+    "fr": "Scénarios climatiques CH2025, grille",
+    "it": "Scenari climatici CH2025, griglia"
+   },
+   "doc": "/c-climate-data/c8-c9-climate-scenarios"
+  },
+  {
+   "key": "radar-rzc",
+   "collection": "ch.meteoschweiz.ogd-radar-precip",
+   "group": "D",
+   "metric": "latency",
+   "source": {
+    "kind": "asset_name",
+    "prefix": "rzc",
+    "time": "yyjjjhhmm"
+   },
+   "interval": "5min",
+   "interval_min": 5,
+   "ok_max_min": 5,
+   "warn_max_min": 15,
+   "realtime": true,
+   "name": {
+    "en": "Radar precipitation RZC",
+    "de": "Radar Niederschlag RZC",
+    "fr": "Radar précipitations RZC",
+    "it": "Radar precipitazioni RZC"
+   },
+   "doc": "/d-radar-data/d1-precipitation-radar-products"
+  },
+  {
+   "key": "radar-cpc",
+   "collection": "ch.meteoschweiz.ogd-radar-precip",
+   "group": "D",
+   "metric": "latency",
+   "source": {
+    "kind": "asset_name",
+    "prefix": "cpc",
+    "time": "yyjjjhhmm"
+   },
+   "interval": "5min",
+   "interval_min": 5,
+   "ok_max_min": 10,
+   "warn_max_min": 30,
+   "realtime": true,
+   "name": {
+    "en": "Radar CombiPrecip CPC",
+    "de": "Radar CombiPrecip CPC",
+    "fr": "Radar CombiPrecip CPC",
+    "it": "Radar CombiPrecip CPC"
+   },
+   "doc": "/d-radar-data/d1-precipitation-radar-products"
+  },
+  {
+   "key": "radar-hail",
+   "collection": "ch.meteoschweiz.ogd-radar-hail",
+   "group": "D",
+   "metric": "age",
+   "interval": "5min",
+   "ok_max_min": 15,
+   "warn_max_min": 60,
+   "realtime": true,
+   "name": {
+    "en": "Radar hail",
+    "de": "Radar Hagel",
+    "fr": "Radar grêle",
+    "it": "Radar grandine"
+   },
+   "doc": "/d-radar-data/d3-hail-radar-products"
+  },
+  {
+   "key": "forecasting-icon-ch1",
+   "collection": "ch.meteoschweiz.ogd-forecasting-icon-ch1",
+   "group": "E",
+   "metric": "age",
+   "interval": "3h",
+   "ok_max_min": 240,
+   "warn_max_min": 480,
+   "realtime": false,
+   "name": {
+    "en": "Forecast model ICON-CH1-EPS",
+    "de": "Prognosemodell ICON-CH1-EPS",
+    "fr": "Modèle de prévision ICON-CH1-EPS",
+    "it": "Modello di previsione ICON-CH1-EPS"
+   },
+   "doc": "/e-forecast-data/e2-e3-numerical-weather-forecasting-model"
+  },
+  {
+   "key": "forecasting-icon-ch2",
+   "collection": "ch.meteoschweiz.ogd-forecasting-icon-ch2",
+   "group": "E",
+   "metric": "age",
+   "interval": "6h",
+   "ok_max_min": 420,
+   "warn_max_min": 840,
+   "realtime": false,
+   "name": {
+    "en": "Forecast model ICON-CH2-EPS",
+    "de": "Prognosemodell ICON-CH2-EPS",
+    "fr": "Modèle de prévision ICON-CH2-EPS",
+    "it": "Modello di previsione ICON-CH2-EPS"
+   },
+   "doc": "/e-forecast-data/e2-e3-numerical-weather-forecasting-model"
+  },
+  {
+   "key": "local-forecasting",
+   "collection": "ch.meteoschweiz.ogd-local-forecasting",
+   "group": "E",
+   "metric": "latency",
+   "source": {
+    "kind": "asset_name",
+    "prefix": "vnut12",
+    "time": "yyyymmddhhmm",
+    "complete_run": true
+   },
+   "interval": "hourly",
+   "interval_min": 60,
+   "ok_max_min": 15,
+   "warn_max_min": 45,
+   "realtime": false,
+   "name": {
+    "en": "Local forecasts",
+    "de": "Lokalprognosen",
+    "fr": "Prévisions locales",
+    "it": "Previsioni locali"
+   },
+   "doc": "/e-forecast-data/e4-local-forecast-data"
+  },
+  {
+   "key": "analysis-kenda-ch1",
+   "collection": "ch.meteoschweiz.ogd-analysis-kenda-ch1",
+   "group": "E",
+   "metric": "age",
+   "interval": "hourly",
+   "ok_max_min": 120,
+   "warn_max_min": 240,
+   "realtime": false,
+   "name": {
+    "en": "Analysis KENDA-CH1",
+    "de": "Analyse KENDA-CH1",
+    "fr": "Analyse KENDA-CH1",
+    "it": "Analisi KENDA-CH1"
+   },
+   "doc": "/e-forecast-data/e5-numerical-weather-analysis-data"
+  }
+ ]
+}

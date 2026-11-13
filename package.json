@@ -1,0 +1,17 @@
+{
+  "name": "opendata-status",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Open Data Status MeteoSwiss: how up to date the OGD collections are on the FSDI STAC API",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node build.mjs --serve"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
