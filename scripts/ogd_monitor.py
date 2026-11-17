@@ -8,7 +8,9 @@ Two kinds of checks, set per item in the configuration:
   metric "age"      minutes since the collection's most recently updated item was updated
   metric "latency"  publication latency: time from the data's reference time to its availability
                     - source "asset_name":      reference time from the asset file name, availability = asset creation on STAC
-                    - source "station_now_csv": newest reference_timestamp in <station>_*_now.csv, availability = HTTP Last-Modified
+                    - source "station_now_csv": newest reference_timestamp in <station>_*_now.csv, availability = "updated" of that
+                      asset on the STAC API (the file's Last-Modified only as fallback: some files are
+                      rewritten without new data). source.coverage: also count the stations whose file is current
                     A latency item also counts as down when its newest reference time is older than
                     interval_min + warn_max_min (no new data arriving).
 
@@ -127,18 +129,66 @@ def parse_ref(s):
     return None
 
 
-def latency_from_station_csv(api, item_cfg):
-    """(newest reference_timestamp, Last-Modified) of a station's *_now.csv."""
+def station_items(api, collection):
+    """All station items of a collection (one search request)."""
+    body = json.dumps({"collections": [collection], "limit": 100}).encode()
+    req = urllib.request.Request(api.rstrip("/") + "/search", data=body,
+                                 headers={**UA, "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:
+        return json.load(r).get("features", [])
+
+
+def get_item(api, collection, item_id):
+    url = f"{api.rstrip('/')}/collections/{collection}/items/{item_id}"
+    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=TIMEOUT_S) as r:
+        return json.load(r)
+
+
+def now_asset(feature, suffix):
+    """The station's *_<suffix>.csv asset (dict) or None."""
+    for name, a in (feature or {}).get("assets", {}).items():
+        if name.endswith(f"_{suffix}.csv"):
+            return a
+    return None
+
+
+def asset_updated(a):
+    v = a and (a.get("updated") or a.get("created"))
+    return parse_iso(v) if v else None
+
+
+def latency_from_station_csv(api, item_cfg, now):
+    """(newest reference_timestamp, availability, station coverage or None) of a station's *_now.csv.
+
+    Availability is the "updated" time of the asset on the STAC API. The file's Last-Modified is not
+    reliable for every collection: pollen files are rewritten between updates without new data, which
+    made the latency look up to 50 minutes longer than it was.
+    """
     src = item_cfg["source"]
     coll = item_cfg["collection"]
     short = coll.replace("ch.meteoschweiz.", "")
+    suffix = src.get("suffix", "t_now")
     station = src["station"]
+    feats = station_items(api, coll) if station == "latest" or src.get("coverage") else None
+
+    coverage = None
+    if src.get("coverage"):
+        limit = item_cfg["interval_min"] + item_cfg["warn_max_min"]
+        with_file = [(f, asset_updated(now_asset(f, suffix))) for f in feats if now_asset(f, suffix)]
+        stale = sorted((f["properties"].get("title") or f["id"].upper()) for f, u in with_file
+                       if not u or minutes(now, u) > limit)
+        coverage = {"total": len(with_file), "ok": len(with_file) - len(stale), "stale": stale}
+
     if station == "latest":
-        f = newest_item(api, coll)
-        if not f:
-            return None, None
-        station = f["id"]
-    url = f"{FILES}/{coll}/{station}/{short}_{station}_{src.get('suffix', 't_now')}.csv"
+        cands = [f for f in feats if asset_updated(now_asset(f, suffix))]
+        if not cands:
+            return None, None, coverage
+        feature = max(cands, key=lambda f: asset_updated(now_asset(f, suffix)))
+        station = feature["id"]
+    else:
+        feature = get_item(api, coll, station)
+
+    url = f"{FILES}/{coll}/{station}/{short}_{station}_{suffix}.csv"
     with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=TIMEOUT_S) as r:
         lm = r.headers.get("Last-Modified")
         text = r.read().decode("utf-8", errors="replace")
@@ -147,8 +197,10 @@ def latency_from_station_csv(api, item_cfg):
     i = header.index("reference_timestamp")
     refs = [parse_ref(l.split(";")[i]) for l in lines[1:] if len(l.split(";")) > i]
     refs = [r for r in refs if r]
-    available = email.utils.parsedate_to_datetime(lm).astimezone(UTC) if lm else None
-    return (max(refs) if refs else None), available
+    available = asset_updated(now_asset(feature, suffix))
+    if not available and lm:
+        available = email.utils.parsedate_to_datetime(lm).astimezone(UTC)
+    return (max(refs) if refs else None), available, coverage
 
 
 def classify(item_cfg, now, updated=None, ref=None, available=None):
@@ -193,7 +245,7 @@ def main():
     rows, items, failures = [], [], 0
     counts = {"realtime_total": 0, "realtime_ok": 0, "monitored_total": 0, "monitored_ok": 0}
     for c in cfg["items"]:
-        updated = ref = available = run = None
+        updated = ref = available = run = coverage = None
         try:
             if c["metric"] == "age":
                 f = newest_item(api, c["collection"])
@@ -201,7 +253,7 @@ def main():
             elif c["source"]["kind"] == "asset_name":
                 ref, available, run = latency_from_assets(api, c, now)
             elif c["source"]["kind"] == "station_now_csv":
-                ref, available = latency_from_station_csv(api, c)
+                ref, available, coverage = latency_from_station_csv(api, c, now)
         except Exception as e:  # network or format error for this item
             print(f"warning: {c['key']}: {e}", file=sys.stderr)
             failures += 1
@@ -209,7 +261,8 @@ def main():
         rows.append({"key": c["key"], "collection": c["collection"], "group": c["group"], "metric": c["metric"],
                      "updated": iso(updated), "ref_time": iso(ref), "available": iso(available),
                      "value_min": value, "status": status, "checked": checked,
-                     **({"run_files": run["files"], "run_files_expected": run["expected"], "run_complete": run["complete"]} if run else {})})
+                     **({"run_files": run["files"], "run_files_expected": run["expected"], "run_complete": run["complete"]} if run else {}),
+                     **({"stations_total": coverage["total"], "stations_ok": coverage["ok"], "stations_stale": coverage["stale"]} if coverage else {})})
         if status == "static":
             continue
         items.append({"checked": checked, "key": c["key"], "status": status, "value_min": value})
