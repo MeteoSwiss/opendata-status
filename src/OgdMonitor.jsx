@@ -109,15 +109,38 @@ async function measure(api, c) {
     });
     return best || {};
   }
-  // station_now_csv
+  // station_now_csv: availability is the asset's "updated" time on the STAC API (Last-Modified only as
+  // fallback: pollen files are rewritten between updates without new data)
+  const suffix = c.source.suffix || 't_now';
+  const nowAsset = (f) => {
+    const e = Object.entries((f && f.assets) || {}).find(([k]) => k.endsWith(`_${suffix}.csv`));
+    return e ? e[1] : null;
+  };
+  const assetTime = (a) => (a && (a.updated || a.created) ? new Date(a.updated || a.created) : null);
   let station = c.source.station;
+  const all = station === 'latest' || c.source.coverage ? await fetchAllItems(api, c.collection) : null;
+
+  let stations;
+  if (c.source.coverage) {
+    const limit = (c.interval_min + c.warn_max_min) * 60e3;
+    const withFile = all.filter((f) => nowAsset(f));
+    const stale = withFile
+      .filter((f) => { const u = assetTime(nowAsset(f)); return !u || Date.now() - u > limit; })
+      .map((f) => (f.properties && f.properties.title) || f.id.toUpperCase())
+      .sort();
+    stations = {total: withFile.length, ok: withFile.length - stale.length, stale};
+  }
+
+  let feature;
   if (station === 'latest') {
-    const f = await fetchNewest(api, c.collection);
-    if (!f) return {};
-    station = f.id;
+    feature = all.filter((f) => assetTime(nowAsset(f))).sort((a, b) => assetTime(nowAsset(b)) - assetTime(nowAsset(a)))[0];
+    if (!feature) return {stations};
+    station = feature.id;
+  } else {
+    feature = await fetchJson(`${api}/collections/${c.collection}/items/${station}`);
   }
   const short = c.collection.replace('ch.meteoschweiz.', '');
-  const r = await fetch(`${FILES}/${c.collection}/${station}/${short}_${station}_${c.source.suffix || 't_now'}.csv`, {cache: 'no-store'});
+  const r = await fetch(`${FILES}/${c.collection}/${station}/${short}_${station}_${suffix}.csv`, {cache: 'no-store'});
   if (!r.ok) throw new Error(`CSV ${r.status}`);
   const lm = r.headers.get('Last-Modified');
   const lines = (await r.text()).split(/\r?\n/).filter((l) => l.trim());
@@ -127,7 +150,7 @@ async function measure(api, c) {
     const v = parseRef(l.split(';')[i]);
     if (v && (!ref || v > ref)) ref = v;
   });
-  return {ref, available: lm ? new Date(lm) : null};
+  return {ref, available: assetTime(nowAsset(feature)) || (lm ? new Date(lm) : null), stations};
 }
 
 function fmtAge(min, t) {
@@ -186,6 +209,18 @@ function fetchNewest(api, id) {
     }).then((j) => (j.features || [])[0] || null));
   }
   return pending.get(id);
+}
+
+// All items (stations) of a collection in one request
+async function fetchAllItems(api, id) {
+  const r = await fetch(`${api}/search`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    cache: 'no-store',
+    body: JSON.stringify({collections: [id], limit: 100}),
+  });
+  if (!r.ok) throw new Error(`STAC ${r.status}`);
+  return (await r.json()).features || [];
 }
 
 async function fetchJson(url) {
@@ -381,14 +416,6 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   const pctCls = (v, floor) => (v === null ? '' : v >= GOAL ? styles.ok : v >= floor ? styles.warn : styles.bad);
   const statusText = (cls) => t.status[cls];
 
-  // history checks for the real-time strip, plus the live check
-  const rtChecks = hist.summary.map((h) => ({
-    t: new Date(h.checked),
-    cls: h.realtime_ok === h.realtime_total ? 'ok' : h.realtime_ok === 0 ? 'bad' : 'warn',
-    text: `${t.ofCurrent(h.realtime_ok, h.realtime_total)} (${t.check} ${fmtClock(h.checked, t)})`,
-  }));
-  rtChecks.push({t: live.checked, cls: rtCls, text: `${t.ofCurrent(rtOk, realtime.length)} (${t.live} ${fmtClock(live.checked, t)})`});
-
   const itemChecks = (r) => {
     const pts = hist.items.filter((p) => p.key === r.c.key).map((p) => {
       const cls = p.status;
@@ -415,6 +442,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
           ? t.latLine(r.value === null || r.value === undefined ? '–' : fmtAge(r.value, t), fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
             + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
             + (r.stalled ? ` · ${t.noNewData}` : '')
+            + (r.m.stations ? ` · ${t.stations(r.m.stations.ok, r.m.stations.total)}${r.m.stations.stale.length ? ` · ${t.staleList}${r.m.stations.stale.join(', ')}` : ''}` : '')
           : t.line(t.interval[r.c.interval], fmtTime(r.m.updated, t), fmtAge(r.value, t)))}</p>
       </div>
   );
@@ -462,16 +490,6 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         <p className={`${styles.small} ${styles.sub2}`}>{t.overviewSub}</p>
         {history && history.error && <p className={styles.notice}>{t.historyMissing}</p>}
         <div className={styles.bars}>
-          <div className={styles.bar}>
-            <div className={styles.row}>
-              <div className={styles.barTitle}>
-                <span className={styles.barName}>{t.realtime}</span>
-                <small>{t.rtScope}</small>
-              </div>
-              <span className={`${styles.status} ${styles[rtCls]}`}>{rtCls === 'ok' ? t.allCurrent : t.ofCurrent(rtOk, realtime.length)}</span>
-            </div>
-            <Strip checks={rtChecks} end={live.checked} firstEver={firstEver} t={t} />
-          </div>
           {GROUPS.map((g) => {
             // order as in config.json (= order of the documentation)
             const list = rows.filter((r) => r.c.group === g && r.cls !== 'static');
