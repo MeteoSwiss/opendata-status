@@ -72,13 +72,19 @@ function parseRef(s) {
 // Measures one configured item live: {updated} for age, {ref, available} for latency
 async function measure(api, c) {
   if (c.metric === 'age') {
+    if (c.source && c.source.kind === 'newest_asset') {
+      // age of the newest file in the newest daily item (e.g. radar hail)
+      const times = (await fetchDated(api, c.collection, 1)).flatMap((f) =>
+        Object.values(f.assets).map((a) => a.created || a.updated).filter(Boolean).map((v) => +new Date(v)));
+      return {updated: times.length ? new Date(Math.max(...times)) : null};
+    }
     const f = await fetchNewest(api, c.collection);
     return {updated: f ? new Date(f.properties.updated) : null};
   }
   if (c.source.kind === 'asset_name' && c.source.complete_run) {
     // a model run is available once its last file (all parameters) is there
     const runs = new Map();
-    (await fetchNewestN(api, c.collection, 2)).forEach((f) => {
+    (await fetchDated(api, c.collection, 2)).forEach((f) => {
       Object.entries(f.assets).forEach(([name, a]) => {
         const ref = refFromName(name, c.source);
         if (!ref) return;
@@ -101,12 +107,12 @@ async function measure(api, c) {
     return prev ? run(prev, true) : run(order[0], false);
   }
   if (c.source.kind === 'asset_name') {
-    const f = await fetchNewest(api, c.collection);
+    // today and, after midnight, yesterday
     let best = null;
-    Object.entries(f ? f.assets : {}).forEach(([name, a]) => {
+    (await fetchDated(api, c.collection, 2)).forEach((f) => Object.entries(f.assets).forEach(([name, a]) => {
       const ref = refFromName(name, c.source);
       if (ref && (!best || ref > best.ref)) best = {ref, available: new Date(a.created || a.updated)};
-    });
+    }));
     return best || {};
   }
   // station_now_csv: availability is the asset's "updated" time on the STAC API (Last-Modified only as
@@ -131,26 +137,41 @@ async function measure(api, c) {
     stations = {total: withFile.length, ok: withFile.length - stale.length, stale};
   }
 
-  let feature;
-  if (station === 'latest') {
-    feature = all.filter((f) => assetTime(nowAsset(f))).sort((a, b) => assetTime(nowAsset(b)) - assetTime(nowAsset(a)))[0];
-    if (!feature) return {stations};
-    station = feature.id;
-  } else {
-    feature = await fetchJson(`${api}/collections/${c.collection}/items/${station}`);
-  }
   const short = c.collection.replace('ch.meteoschweiz.', '');
-  const r = await fetch(`${FILES}/${c.collection}/${station}/${short}_${station}_${suffix}.csv`, {cache: 'no-store'});
-  if (!r.ok) throw new Error(`CSV ${r.status}`);
-  const lm = r.headers.get('Last-Modified');
-  const lines = (await r.text()).split(/\r?\n/).filter((l) => l.trim());
-  const i = lines[0].split(';').indexOf('reference_timestamp');
-  let ref = null;
-  lines.slice(1).forEach((l) => {
-    const v = parseRef(l.split(';')[i]);
-    if (v && (!ref || v > ref)) ref = v;
-  });
-  return {ref, available: assetTime(nowAsset(feature)) || (lm ? new Date(lm) : null), stations};
+  const measureStation = async (feature) => {
+    const r = await fetch(`${FILES}/${c.collection}/${feature.id}/${short}_${feature.id}_${suffix}.csv`, {cache: 'no-store'});
+    if (!r.ok) throw new Error(`CSV ${r.status}`);
+    const lm = r.headers.get('Last-Modified');
+    const lines = (await r.text()).split(/\r?\n/).filter((l) => l.trim());
+    const i = lines[0].split(';').indexOf('reference_timestamp');
+    let ref = null;
+    lines.slice(1).forEach((l) => {
+      const v = parseRef(l.split(';')[i]);
+      if (v && (!ref || v > ref)) ref = v;
+    });
+    return {ref, available: assetTime(nowAsset(feature)) || (lm ? new Date(lm) : null)};
+  };
+
+  if (station !== 'latest') {
+    const feature = await fetchJson(`${api}/collections/${c.collection}/items/${station}`);
+    return {...(await measureStation(feature)), stations};
+  }
+  const cands = all.filter((f) => assetTime(nowAsset(f)));
+  if (!cands.length) return {stations};
+  if (c.source.aggregate !== 'median') {
+    const newest = cands.sort((a, b) => assetTime(nowAsset(b)) - assetTime(nowAsset(a)))[0];
+    return {...(await measureStation(newest)), stations};
+  }
+  // median over the current stations: one late station does not make the whole dataset late
+  const limit = (c.interval_min + c.warn_max_min) * 60e3;
+  const current = cands.filter((f) => Date.now() - assetTime(nowAsset(f)) <= limit);
+  const results = await Promise.allSettled((current.length ? current : cands).map(measureStation));
+  const measured = results
+    .filter((x) => x.status === 'fulfilled' && x.value.ref && x.value.available)
+    .map((x) => x.value)
+    .sort((a, b) => (a.available - a.ref) - (b.available - b.ref));
+  if (!measured.length) return {stations};
+  return {...measured[Math.floor((measured.length - 1) / 2)], stations};
 }
 
 function fmtAge(min, t) {
@@ -192,6 +213,15 @@ async function fetchNewestN(api, id, n) {
   });
   if (!r.ok) throw new Error(`STAC ${r.status}`);
   return (await r.json()).features || [];
+}
+
+// Newest non-empty items of a collection with one item per day ("YYYYMMDD-ch"), newest first.
+// The last update alone does not name the newest data: early in the morning an empty item for the
+// next day appears, and items from about a week ago are touched again.
+async function fetchDated(api, id, n) {
+  const fs = (await fetchNewestN(api, id, 6)).filter((f) => Object.keys(f.assets || {}).length);
+  fs.sort((x, y) => (x.id < y.id ? 1 : x.id > y.id ? -1 : 0));
+  return fs.slice(0, n);
 }
 
 // Newest item of a collection; requests for the same collection within one check are shared
