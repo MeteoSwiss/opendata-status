@@ -1,5 +1,5 @@
 {
- "description": "Configuration of the OGD monitor, shared by scripts/monitor/ogd_monitor.py and src/components/OgdMonitor. One entry per monitored product. metric 'age': minutes since the collection's newest item was updated; metric 'latency': publication latency in minutes, i.e. time from the data's reference time (timestamp in the file name, or newest reference_timestamp in a *_now.csv) to its availability (asset creation on the STAC API, or for *_now.csv the asset's 'updated' time on the STAC API). ok_max_min: up to this counts as up to date; warn_max_min: up to this counts as delayed, beyond as down. For latency entries, a product also counts as down when its newest reference time is older than interval_min + warn_max_min (no new data). null thresholds = static, not monitored. realtime: counts towards OKR O3-KR1. The order of items is the display order (as in the documentation); sub: true marks a single station shown under its collection. doc: path of the documentation page (without locale); null = title without link. monitoring_pending: true shows 'monitoring to follow' instead of the history strip. source.complete_run: true measures latency until the last file of a model run is available (all parameters), not the first. source.coverage: true also counts how many stations of the collection have a current *_now.csv (older than interval_min + warn_max_min = not current); shown as an extra line, does not change the status.",
+ "description": "Configuration of the OGD monitor, shared by scripts/monitor/ogd_monitor.py and src/components/OgdMonitor. One entry per monitored product. metric 'age': minutes since the collection's newest item was updated; metric 'latency': publication latency in minutes, i.e. time from the data's reference time (timestamp in the file name, or newest reference_timestamp in a *_now.csv) to its availability (asset creation on the STAC API, or for *_now.csv the asset's 'updated' time on the STAC API). ok_max_min: up to this counts as up to date; warn_max_min: up to this counts as delayed, beyond as down. For latency entries, a product also counts as down when its newest reference time is older than interval_min + warn_max_min (no new data). null thresholds = static, not monitored. realtime: counts towards OKR O3-KR1. The order of items is the display order (as in the documentation); sub: true marks a single station shown under its collection. doc: path of the documentation page (without locale); null = title without link. monitoring_pending: true shows 'monitoring to follow' instead of the history strip. source.complete_run: true measures latency until the last file of a model run is available (all parameters), not the first. source.aggregate 'median' (with station 'latest'): latency of the station with the median latency among all current stations. Metric 'age' with source.kind 'newest_asset': age of the newest file in the newest daily item instead of the item's last update. Collections with one item per day are read by item date, not by last update. source.coverage: true also counts how many stations of the collection have a current *_now.csv (older than interval_min + warn_max_min = not current); shown as an extra line, does not change the status.",
  "stac_api": "https://data.geo.admin.ch/api/stac/v1",
  "items": [
   {
@@ -142,7 +142,8 @@
     "kind": "station_now_csv",
     "station": "latest",
     "suffix": "h_now",
-    "coverage": true
+    "coverage": true,
+    "aggregate": "median"
    },
    "interval": "hourly",
    "interval_min": 60,
@@ -388,7 +389,10 @@
     "fr": "Radar grêle",
     "it": "Radar grandine"
    },
-   "doc": "/d-radar-data/d3-hail-radar-products"
+   "doc": "/d-radar-data/d3-hail-radar-products",
+   "source": {
+    "kind": "newest_asset"
+   }
   },
   {
    "key": "forecasting-icon-ch1",

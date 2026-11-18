@@ -1,0 +1,819 @@
+{
+ "description": "Corrections of history entries that were measured wrongly. Applied on every run by scripts/ogd_monitor.py --corrections (idempotent); entries older than 30 days have no effect and can be removed. value_min null = true value unknown.",
+ "items": [
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-11T00:04:20Z",
+   "status": "ok",
+   "value_min": 4.9,
+   "was": {
+    "status": "bad",
+    "value_min": null
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-11T05:04:28Z",
+   "status": "ok",
+   "value_min": 4.9,
+   "was": {
+    "status": "bad",
+    "value_min": 4.4
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-rzc",
+   "checked": "2026-11-11T05:04:28Z",
+   "status": "ok",
+   "value_min": 0.8,
+   "was": {
+    "status": "bad",
+    "value_min": 0.6
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-11T11:10:25Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 69.0
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-12T04:04:29Z",
+   "status": "ok",
+   "value_min": 4.9,
+   "was": {
+    "status": "bad",
+    "value_min": null
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-rzc",
+   "checked": "2026-11-12T04:04:29Z",
+   "status": "ok",
+   "value_min": 0.9,
+   "was": {
+    "status": "bad",
+    "value_min": null
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-12T05:04:26Z",
+   "status": "ok",
+   "value_min": 5.9,
+   "was": {
+    "status": "bad",
+    "value_min": 4.7
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-rzc",
+   "checked": "2026-11-12T05:04:26Z",
+   "status": "ok",
+   "value_min": 0.9,
+   "was": {
+    "status": "bad",
+    "value_min": 1.0
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-12T06:08:50Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-12T23:07:13Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.1
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-13T00:04:32Z",
+   "status": "ok",
+   "value_min": 4.9,
+   "was": {
+    "status": "bad",
+    "value_min": null
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T04:07:11Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T14:14:39Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T15:13:05Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T15:38:05Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T16:15:15Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T18:15:24Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T19:11:48Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.4
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T22:12:19Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.9
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-13T23:12:39Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.9
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T04:15:04Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T05:13:23Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.0
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T07:13:21Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.5
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T08:15:42Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T08:38:34Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T09:13:25Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T11:11:24Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T14:12:07Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.5
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T15:11:44Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.4
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T17:11:14Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T18:14:41Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.7
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T19:10:21Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T19:38:55Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.7
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T20:12:41Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T21:11:36Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.4
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-14T23:11:54Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T01:14:02Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.0
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T03:16:17Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.1
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T04:16:00Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T05:13:36Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.1
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-15T05:38:02Z",
+   "status": "ok",
+   "value_min": 5.2,
+   "was": {
+    "status": "bad",
+    "value_min": 4.3
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-rzc",
+   "checked": "2026-11-15T05:38:02Z",
+   "status": "ok",
+   "value_min": 0.9,
+   "was": {
+    "status": "bad",
+    "value_min": 0.6
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T09:13:42Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T10:12:25Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T11:11:33Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 69.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T14:12:14Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T15:11:37Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T17:11:00Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.5
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T18:15:16Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.9
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T19:10:46Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.5
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T20:13:09Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T22:12:13Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.7
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-15T23:13:26Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.8
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T11:16:33Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.0
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T16:15:45Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T17:13:51Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T18:16:57Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.6
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T19:12:33Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.7
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T21:13:10Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.2
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-16T23:11:56Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.0
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T01:15:13Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.1
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T03:16:16Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.1
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T04:16:00Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 66.9
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-17T06:43:34Z",
+   "status": "ok",
+   "value_min": 5.9,
+   "was": {
+    "status": "bad",
+    "value_min": 5.7
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-rzc",
+   "checked": "2026-11-17T06:43:34Z",
+   "status": "ok",
+   "value_min": 0.9,
+   "was": {
+    "status": "bad",
+    "value_min": 0.8
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T07:15:56Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.3
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T09:16:16Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 67.4
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T10:14:42Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 68.7
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T11:12:38Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 69.0
+   },
+   "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T14:38:08Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "one station without the newest hour determined the whole dataset (median since 18.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-17T17:38:58Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 137.2
+   },
+   "reason": "one station without the newest hour determined the whole dataset (median since 18.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T02:19:09Z",
+   "status": "ok",
+   "value_min": null,
+   "was": {
+    "status": "warn",
+    "value_min": 137.0
+   },
+   "reason": "one station without the newest hour determined the whole dataset (median since 18.11.2026)"
+  },
+  {
+   "key": "radar-cpc",
+   "checked": "2026-11-18T06:23:11Z",
+   "status": "ok",
+   "value_min": 5.5,
+   "was": {
+    "status": "bad",
+    "value_min": 4.9
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "radar-rzc",
+   "checked": "2026-11-18T06:23:11Z",
+   "status": "ok",
+   "value_min": 1.0,
+   "was": {
+    "status": "bad",
+    "value_min": 0.4
+   },
+   "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  }
+ ]
+}
