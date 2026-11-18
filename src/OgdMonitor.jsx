@@ -426,24 +426,34 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     return pts;
   };
 
+  // one compact entry per dataset: title, key figure and status on one line, slim strip, details below
+  const keyFigure = (r) => {
+    if (r.c.monitoring_pending || r.value === null || r.value === undefined) return '–';
+    return r.c.metric === 'latency' ? t.valLat(fmtAge(r.value, t)) : t.valAge(fmtAge(r.value, t));
+  };
   const renderItem = (r) => (
-      <div key={r.c.key} className={r.c.sub ? `${styles.service} ${styles.sub}` : styles.service} id={`monitor-${r.c.key}`}>
+      <div key={r.c.key} id={`monitor-${r.c.key}`}
+        className={[styles.service, r.c.sub && styles.sub, r.cls !== 'ok' && styles.attention].filter(Boolean).join(' ')}>
         <div className={styles.row}>
           <div className={styles.name}>
             {r.c.doc ? <a href={docUrl(r.c.doc, locale)}>{name(r.c)}</a> : name(r.c)}
-            <small>{r.c.collection.replace('ch.meteoschweiz.', '')}</small>
           </div>
-          <span className={`${styles.status} ${styles[r.cls]}`}>{statusText(r.cls)}</span>
+          <div className={styles.keyval}>
+            <span className={styles.figure}>{keyFigure(r)}</span>
+            {r.cls === 'ok'
+              ? <span className={`${styles.status} ${styles.ok} ${styles.dotOnly}`} title={statusText('ok')}><span className={styles.srOnly}>{statusText('ok')}</span></span>
+              : <span className={`${styles.status} ${styles[r.cls]}`}>{statusText(r.cls)}</span>}
+          </div>
         </div>
         {r.c.monitoring_pending
           ? <p className={styles.pending}>{t.pending}</p>
           : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t} />}
-        <p className={styles.statLine}>{segments(r.c.metric === 'latency'
-          ? t.latLine(r.value === null || r.value === undefined ? '–' : fmtAge(r.value, t), fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
+        <p className={styles.statLine}>{segments(r.c.collection.replace('ch.meteoschweiz.', '') + ' · ' + (r.c.metric === 'latency'
+          ? t.metaLat(fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
             + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
             + (r.stalled ? ` · ${t.noNewData}` : '')
             + (r.m.stations ? ` · ${t.stations(r.m.stations.ok, r.m.stations.total)}${r.m.stations.stale.length ? ` · ${t.staleList}${r.m.stations.stale.join(', ')}` : ''}` : '')
-          : t.line(t.interval[r.c.interval], fmtTime(r.m.updated, t), fmtAge(r.value, t)))}</p>
+          : t.metaAge(t.interval[r.c.interval], fmtTime(r.m.updated, t))))}</p>
       </div>
   );
 
