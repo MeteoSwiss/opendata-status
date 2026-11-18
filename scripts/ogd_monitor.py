@@ -57,6 +57,24 @@ def newest_items(api, collection, n=1):
         return json.load(r).get("features", [])
 
 
+def dated_items(api, collection, n=1):
+    """Newest non-empty items of a collection with one item per day ("YYYYMMDD-ch"), newest first.
+
+    The last update alone does not name the newest data: early in the morning an empty item for the
+    next day appears, and items from about a week ago are touched again. Both made radar data look
+    stalled. So: take the recently updated items, drop empty ones and order them by id (= date)."""
+    feats = [f for f in newest_items(api, collection, 6) if f.get("assets")]
+    return sorted(feats, key=lambda f: f["id"], reverse=True)[:n]
+
+
+def newest_asset_time(api, collection):
+    """Creation time of the newest file in the newest dated item (age of e.g. radar hail)."""
+    times = [parse_iso(a.get("created") or a.get("updated"))
+             for f in dated_items(api, collection, 1) for a in f["assets"].values()
+             if a.get("created") or a.get("updated")]
+    return max(times) if times else None
+
+
 def newest_item(api, collection):
     features = newest_items(api, collection)
     return features[0] if features else None
@@ -88,18 +106,16 @@ def latency_from_assets(api, item_cfg, now):
     (now - reference time) is reported and the run is marked incomplete."""
     src = item_cfg["source"]
     if not src.get("complete_run"):
-        f = newest_item(api, item_cfg["collection"])
-        if not f:
-            return None, None, None
         best = None
-        for name, a in f["assets"].items():
-            ref = ref_time_from_name(name, src)
-            if ref and (best is None or ref > best[0]):
-                best = (ref, parse_iso(a.get("created") or a.get("updated")))
+        for f in dated_items(api, item_cfg["collection"], 2):  # today and, after midnight, yesterday
+            for name, a in f["assets"].items():
+                ref = ref_time_from_name(name, src)
+                if ref and (best is None or ref > best[0]):
+                    best = (ref, parse_iso(a.get("created") or a.get("updated")))
         return (best[0], best[1], None) if best else (None, None, None)
 
     runs = {}
-    for f in newest_items(api, item_cfg["collection"], 2):  # today and, around midnight, the previous day
+    for f in dated_items(api, item_cfg["collection"], 2):  # today and, around midnight, the previous day
         for name, a in f["assets"].items():
             ref = ref_time_from_name(name, src)
             if ref:
@@ -160,6 +176,9 @@ def asset_updated(a):
 def latency_from_station_csv(api, item_cfg, now):
     """(newest reference_timestamp, availability, station coverage or None) of a station's *_now.csv.
 
+    station "latest": the most recently updated station; with source.aggregate "median" the station
+    with the median latency among all current stations.
+
     Availability is the "updated" time of the asset on the STAC API. The file's Last-Modified is not
     reliable for every collection: pollen files are rewritten between updates without new data, which
     made the latency look up to 50 minutes longer than it was.
@@ -179,28 +198,50 @@ def latency_from_station_csv(api, item_cfg, now):
                        if not u or minutes(now, u) > limit)
         coverage = {"total": len(with_file), "ok": len(with_file) - len(stale), "stale": stale}
 
-    if station == "latest":
-        cands = [f for f in feats if asset_updated(now_asset(f, suffix))]
-        if not cands:
-            return None, None, coverage
-        feature = max(cands, key=lambda f: asset_updated(now_asset(f, suffix)))
-        station = feature["id"]
-    else:
-        feature = get_item(api, coll, station)
+    def measure_station(feature):
+        sid = feature["id"]
+        url = f"{FILES}/{coll}/{sid}/{short}_{sid}_{suffix}.csv"
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=TIMEOUT_S) as r:
+            lm = r.headers.get("Last-Modified")
+            text = r.read().decode("utf-8", errors="replace")
+        lines = [l for l in text.splitlines() if l.strip()]
+        i = lines[0].split(";").index("reference_timestamp")
+        refs = [parse_ref(l.split(";")[i]) for l in lines[1:] if len(l.split(";")) > i]
+        refs = [r for r in refs if r]
+        available = asset_updated(now_asset(feature, suffix))
+        if not available and lm:
+            available = email.utils.parsedate_to_datetime(lm).astimezone(UTC)
+        return (max(refs) if refs else None), available
 
-    url = f"{FILES}/{coll}/{station}/{short}_{station}_{suffix}.csv"
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=TIMEOUT_S) as r:
-        lm = r.headers.get("Last-Modified")
-        text = r.read().decode("utf-8", errors="replace")
-    lines = [l for l in text.splitlines() if l.strip()]
-    header = lines[0].split(";")
-    i = header.index("reference_timestamp")
-    refs = [parse_ref(l.split(";")[i]) for l in lines[1:] if len(l.split(";")) > i]
-    refs = [r for r in refs if r]
-    available = asset_updated(now_asset(feature, suffix))
-    if not available and lm:
-        available = email.utils.parsedate_to_datetime(lm).astimezone(UTC)
-    return (max(refs) if refs else None), available, coverage
+    if station != "latest":
+        ref, available = measure_station(get_item(api, coll, station))
+        return ref, available, coverage
+
+    cands = [f for f in feats if asset_updated(now_asset(f, suffix))]
+    if not cands:
+        return None, None, coverage
+    if src.get("aggregate") != "median":
+        ref, available = measure_station(max(cands, key=lambda f: asset_updated(now_asset(f, suffix))))
+        return ref, available, coverage
+
+    # median over the current stations: one late station does not make the whole dataset late
+    # (it shows up in the station coverage instead)
+    limit = item_cfg["interval_min"] + item_cfg["warn_max_min"]
+    current = [f for f in cands if minutes(now, asset_updated(now_asset(f, suffix))) <= limit] or cands
+    measured = []
+    for f in current:
+        try:
+            ref, available = measure_station(f)
+        except Exception as e:  # one unreadable station file does not stop the measurement
+            print(f"warning: {item_cfg['key']}/{f['id']}: {e}", file=sys.stderr)
+            continue
+        if ref and available:
+            measured.append((minutes(available, ref), ref, available))
+    if not measured:
+        return None, None, coverage
+    measured.sort(key=lambda m: m[0])
+    _, ref, available = measured[(len(measured) - 1) // 2]
+    return ref, available, coverage
 
 
 def classify(item_cfg, now, updated=None, ref=None, available=None):
@@ -221,6 +262,35 @@ def classify(item_cfg, now, updated=None, ref=None, available=None):
     return ("ok" if lat <= okm else "warn" if lat <= warnm else "bad"), lat
 
 
+def apply_corrections(cfg, path, history, history_items):
+    """Overwrite history entries that were measured wrongly, and recount their checks.
+
+    corrections.json lists entries {key, checked, status, value_min}. Applying them is idempotent,
+    so the file can stay in the repository until its entries have left the 30-day history."""
+    if not path or not os.path.exists(path):
+        return
+    data = load(path)
+    fixes = {(c["key"], c["checked"]): c for c in (data.get("items", []) if isinstance(data, dict) else [])}
+    touched = set()
+    for r in history_items:
+        fix = fixes.get((r.get("key"), r.get("checked")))
+        if fix and (r["status"], r["value_min"]) != (fix["status"], fix.get("value_min")):
+            r["status"], r["value_min"] = fix["status"], fix.get("value_min")
+            touched.add(r["checked"])
+    if not touched:
+        return
+    realtime = {c["key"] for c in cfg["items"] if c.get("realtime")}
+    for h in history:
+        if h["checked"] not in touched:
+            continue
+        rs = [r for r in history_items if r["checked"] == h["checked"]]
+        h["monitored_total"] = len(rs)
+        h["monitored_ok"] = sum(r["status"] == "ok" for r in rs)
+        h["realtime_total"] = sum(r["key"] in realtime for r in rs)
+        h["realtime_ok"] = sum(r["status"] == "ok" and r["key"] in realtime for r in rs)
+    print(f"corrections applied to {len(touched)} checks")
+
+
 def load(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -233,6 +303,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
     ap.add_argument("--data", required=True)
+    ap.add_argument("--corrections", help="JSON file with corrected history entries "
+                    "(default: corrections.json next to the config, if present)")
     args = ap.parse_args()
 
     with open(args.config, encoding="utf-8") as f:
@@ -248,8 +320,11 @@ def main():
         updated = ref = available = run = coverage = None
         try:
             if c["metric"] == "age":
-                f = newest_item(api, c["collection"])
-                updated = parse_iso(f["properties"]["updated"]) if f else None
+                if c.get("source", {}).get("kind") == "newest_asset":
+                    updated = newest_asset_time(api, c["collection"])
+                else:
+                    f = newest_item(api, c["collection"])
+                    updated = parse_iso(f["properties"]["updated"]) if f else None
             elif c["source"]["kind"] == "asset_name":
                 ref, available, run = latency_from_assets(api, c, now)
             elif c["source"]["kind"] == "station_now_csv":
@@ -279,6 +354,9 @@ def main():
     history = [r for r in load(os.path.join(args.data, "history.json")) if keep(r)]
     history.append({"checked": checked, **counts})
     history_items = [r for r in load(os.path.join(args.data, "history_items.json")) if keep(r) and "key" in r] + items
+
+    corrections = args.corrections or os.path.join(os.path.dirname(os.path.abspath(args.config)), "corrections.json")
+    apply_corrections(cfg, corrections, history, history_items)
 
     def dump(name, data, compact=False):
         with open(os.path.join(args.data, name), "w", encoding="utf-8") as f:
