@@ -287,3 +287,34 @@
 
   .detailBody { padding-left: 0; }
 }
+
+/* ---------- compact dataset entries inside an opened group ---------- */
+.groupList { margin-top: 14px; padding: 0 0 0 16px; }
+.groupList .service { padding: 10px 0 10px 12px; margin: 0 0 0 -12px; border-radius: 4px 0 0 4px; }
+.groupList .service.attention { padding-right: 10px; margin-right: -10px; border-radius: 4px; }
+.groupList .service + .service { margin-top: 0; border-top: 1px solid var(--m-line); }
+.groupList .service.attention { background: #fdf6ec; border-top-color: transparent; }
+.groupList .service.attention + .service { border-top-color: transparent; }
+.groupList .sub { margin-left: -12px; padding-left: 38px; border-left: 0; position: relative; }
+.groupList .sub::before { content: "↳"; position: absolute; left: 18px; top: 9px; color: var(--m-muted); font-size: 14px; }
+.groupList .name { font-size: 15px; font-weight: 550; }
+.groupList .sub .name { font-weight: 450; }
+.groupList .row { align-items: baseline; }
+.keyval { display: inline-flex; align-items: baseline; gap: 12px; flex: none; }
+.figure { font-size: 14px; color: var(--m-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dotOnly { gap: 0; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.groupList .history { margin-top: 6px; }
+.groupList .strip { height: 10px; gap: 1px; }
+.groupList .statLine { font-size: 12px; margin-top: 4px !important; }
+
+@media (max-width: 650px) {
+  .groupList { padding-left: 8px; }
+  .groupList .service { padding: 10px 0 10px 8px; margin: 0 0 0 -8px; }
+  .groupList .service.attention { padding-right: 8px; margin-right: -8px; }
+  .groupList .sub { margin-left: -8px; padding-left: 30px; }
+  .groupList .sub::before { left: 12px; }
+  .groupList .strip { height: 10px; }
+  .keyval { gap: 8px; }
+  .figure { font-size: 13px; }
+}
