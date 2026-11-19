@@ -246,6 +246,8 @@
 .bigdot.warn, .bin.warn, .swatch.warn, .status.warn::before { background: var(--m-amber); }
 .bigdot.bad, .bin.bad, .swatch.bad, .status.bad::before { background: var(--m-red); }
 .bin.pre, .swatch.pre { background: var(--m-pre); }
+.bin.pause, .swatch.pause, .status.pause::before { background: #a9b6c3; }
+.status.pause { color: var(--m-muted); }
 .swatch.empty { background: var(--m-empty); }
 .status.ok, .statValue.ok { color: var(--m-green); }
 .status.warn, .statValue.warn { color: var(--m-amber); }
@@ -287,6 +289,8 @@
 
   .detailBody { padding-left: 0; }
 }
+
+.groupNote { margin: 8px 0 0 !important; font-size: 13px; line-height: 1.45; color: var(--m-muted); }
 
 /* ---------- compact dataset entries inside an opened group ---------- */
 .groupList { margin-top: 14px; padding: 0 0 0 16px; }

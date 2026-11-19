@@ -24,20 +24,40 @@ const docUrl = (doc, locale) => `${DOCS}${locale === 'en' ? '' : '/' + locale}${
 const HOURS = 72;
 const HOUR_MS = 3600e3;
 const GOAL = 0.95;
-const RANK = {ok: 1, warn: 2, bad: 3};
+const RANK = {pause: 0, ok: 1, warn: 2, bad: 3};
 const GROUPS = ['A', 'B', 'C', 'D', 'E'];
 
 // ---------- helpers ----------
 
 const FILES = 'https://data.geo.admin.ch';
 
+// Start of the first month after the most recent seasonal break (null without a break)
+function pauseEnd(c, now) {
+  const months = (c.season && c.season.pause_months) || [];
+  if (!months.length) return null;
+  let y = now.getUTCFullYear(), m = now.getUTCMonth() + 1;
+  for (let i = 0; i < 12; i++) {
+    const prev = m === 1 ? 12 : m - 1;
+    if (!months.includes(m) && months.includes(prev)) return new Date(Date.UTC(y, m - 1, 1));
+    if (m === 1) { y -= 1; m = 12; } else m -= 1;
+  }
+  return null;
+}
+
 // Same rules as scripts/monitor/ogd_monitor.py: returns {cls, value} (value in minutes)
 function classify(c, now, m) {
   if (c.ok_max_min === null) return {cls: 'static', value: null};
+  if (((c.season && c.season.pause_months) || []).includes(now.getUTCMonth() + 1)) {
+    // seasonal break (e.g. phenology in winter): measured, but not rated and not counted
+    return {cls: 'pause', value: m.updated ? Math.max(0, (now - m.updated) / 60e3) : null};
+  }
   if (c.metric === 'age') {
     if (!m.updated) return {cls: 'bad', value: null};
     const age = Math.max(0, (now - m.updated) / 60e3);
-    return {cls: age <= c.ok_max_min ? 'ok' : age <= c.warn_max_min ? 'warn' : 'bad', value: age};
+    // after a seasonal break, the expected interval runs from the end of the break
+    const start = pauseEnd(c, now);
+    const rated = start && m.updated < start ? Math.min(age, (now - start) / 60e3) : age;
+    return {cls: rated <= c.ok_max_min ? 'ok' : rated <= c.warn_max_min ? 'warn' : 'bad', value: age};
   }
   if (!m.ref || !m.available) return {cls: 'bad', value: null};
   const lat = Math.max(0, (m.available - m.ref) / 60e3);
@@ -273,7 +293,7 @@ function Strip({checks, end, firstEver, t}) {
       const to = new Date(+from + HOUR_MS);
       const inBin = checks.filter((c) => c.t >= from && c.t < to);
       let cls = '';
-      if (inBin.length) cls = inBin.reduce((w, c) => (RANK[c.cls] > RANK[w] ? c.cls : w), 'ok');
+      if (inBin.length) cls = inBin.reduce((w, c) => (RANK[c.cls] > RANK[w] ? c.cls : w), inBin[0].cls);
       else if (firstEver && to < firstEver) cls = 'pre';
       out.push({from, to, cls, checks: inBin});
     }
@@ -411,7 +431,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
 
   if (!rows) return <p className={styles.loading}>{t.loading}</p>;
 
-  const monitored = rows.filter((r) => r.cls !== 'static');
+  const monitored = rows.filter((r) => r.cls !== 'static' && r.cls !== 'pause');
   const realtime = monitored.filter((r) => r.c.realtime);
   const nOk = (a) => a.filter((r) => r.cls === 'ok').length;
   const rtOk = nOk(realtime);
@@ -463,7 +483,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   };
   const renderItem = (r) => (
       <div key={r.c.key} id={`monitor-${r.c.key}`}
-        className={[styles.service, r.c.sub && styles.sub, r.cls !== 'ok' && styles.attention].filter(Boolean).join(' ')}>
+        className={[styles.service, r.c.sub && styles.sub, !['ok', 'pause'].includes(r.cls) && styles.attention].filter(Boolean).join(' ')}>
         <div className={styles.row}>
           <div className={styles.name}>
             {r.c.doc ? <a href={docUrl(r.c.doc, locale)}>{name(r.c)}</a> : name(r.c)}
@@ -483,7 +503,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
             + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
             + (r.stalled ? ` · ${t.noNewData}` : '')
             + (r.m.stations ? ` · ${t.stations(r.m.stations.ok, r.m.stations.total)}${r.m.stations.stale.length ? ` · ${t.staleList}${r.m.stations.stale.join(', ')}` : ''}` : '')
-          : t.metaAge(t.interval[r.c.interval], fmtTime(r.m.updated, t))))}</p>
+          : t.metaAge(t.interval[r.c.interval], fmtTime(r.m.updated, t)))
+          + (r.c.season ? ` · ${t.pauseInfo}` : ''))}</p>
       </div>
   );
 
@@ -492,7 +513,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     const byKey = new Map(list.map((r) => [r.c.key, r]));
     const byTime = new Map();
     for (const p of hist.items) {
-      if (!byKey.has(p.key)) continue;
+      if (!byKey.has(p.key) || p.status === 'pause') continue;
       if (!byTime.has(p.checked)) byTime.set(p.checked, []);
       byTime.get(p.checked).push(p);
     }
@@ -506,10 +527,11 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         ps.filter((p) => p.status !== 'ok').map((p) => `${name(byKey.get(p.key).c)}: ${t.status[p.status] || p.status}`),
         `${t.check} ${fmtClock(checked, t)}`),
     }));
+    const rated = list.filter((r) => r.cls !== 'pause');
     pts.push({
       t: live.checked,
-      ...summarize(list.length, nOk(list),
-        list.filter((r) => r.cls !== 'ok').map((r) => `${name(r.c)}: ${t.status[r.cls]}`),
+      ...summarize(rated.length, nOk(rated),
+        rated.filter((r) => r.cls !== 'ok').map((r) => `${name(r.c)}: ${t.status[r.cls]}`),
         `${t.live} ${fmtClock(live.checked, t)}`),
     });
     return pts;
@@ -543,8 +565,9 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
                 </div>
               );
             }
-            const ok = nOk(list);
-            const cls = ok === list.length ? 'ok' : ok === 0 ? 'bad' : 'warn';
+            const rated = list.filter((r) => r.cls !== 'pause');
+            const ok = nOk(rated);
+            const cls = ok === rated.length ? 'ok' : ok === 0 ? 'bad' : 'warn';
             const open = openGroups.has(g);
             return (
               <div key={g} className={styles.bar} id={`group-${g}`}>
@@ -556,9 +579,14 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
                       <small>{t.nSets(list.length)}</small>
                     </span>
                   </button>
-                  <span className={`${styles.status} ${styles[cls]}`}>{cls === 'ok' ? t.allCurrent : t.ofCurrent(ok, list.length)}</span>
+                  <span className={`${styles.status} ${styles[cls]}`}>{cls === 'ok' ? t.allCurrent : t.ofCurrent(ok, rated.length)}</span>
                 </div>
                 <Strip checks={groupChecks(list)} end={live.checked} firstEver={firstEver} t={t} />
+                {t.groupNote && t.groupNote[g] && (
+                  <p className={styles.groupNote}>
+                    {t.groupNote[g].pre}<a href={t.groupNote[g].url}>{t.groupNote[g].link}</a>{t.groupNote[g].post}
+                  </p>
+                )}
                 <div id={`group-${g}-list`} className={styles.groupList} hidden={!open}>
                   {list.map(renderItem)}
                 </div>

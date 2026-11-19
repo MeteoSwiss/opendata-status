@@ -6,11 +6,12 @@ import './page.css';
 // Page frame: title, intro, language choice. Language from ?lang=, else browser language, else German.
 const LOCALES = ['de', 'fr', 'it', 'en'];
 const PAGE = {
-  de: {intro: 'Wie aktuell die offenen Daten von MeteoSchweiz auf der STAC API der Bundes-Geodateninfrastruktur verfügbar sind.', docs: 'Dokumentation', source: 'Quellcode', lang: 'Sprache'},
-  fr: {intro: 'Actualité des données ouvertes de MeteoSuisse disponibles sur l’API STAC de l’infrastructure fédérale de données géographiques.', docs: 'Documentation', source: 'Code source', lang: 'Langue'},
-  it: {intro: 'Quanto sono aggiornati i dati aperti di MeteoSvizzera disponibili sull’API STAC dell’infrastruttura federale dei dati geografici.', docs: 'Documentazione', source: 'Codice sorgente', lang: 'Lingua'},
-  en: {intro: 'How up to date the MeteoSwiss open data are on the STAC API of the Federal Spatial Data Infrastructure.', docs: 'Documentation', source: 'Source code', lang: 'Language'},
+  de: {intro: 'Wie aktuell die offenen Daten von MeteoSchweiz auf der STAC API der Bundes-Geodateninfrastruktur verfügbar sind.', status: ['Zum ', 'Betriebsstatus von geo.admin.ch', ' (englisch).'], docs: 'Dokumentation', source: 'Quellcode', lang: 'Sprache'},
+  fr: {intro: 'Actualité des données ouvertes de MeteoSuisse disponibles sur l’API STAC de l’infrastructure fédérale de données géographiques.', status: ['Vers l’', 'état de fonctionnement de geo.admin.ch', ' (en anglais).'], docs: 'Documentation', source: 'Code source', lang: 'Langue'},
+  it: {intro: 'Quanto sono aggiornati i dati aperti di MeteoSvizzera disponibili sull’API STAC dell’infrastruttura federale dei dati geografici.', status: ['Allo ', 'stato operativo di geo.admin.ch', ' (in inglese).'], docs: 'Documentazione', source: 'Codice sorgente', lang: 'Lingua'},
+  en: {intro: 'How up to date the MeteoSwiss open data are on the STAC API of the Federal Spatial Data Infrastructure.', status: ['To the ', 'operational status of geo.admin.ch', '.'], docs: 'Documentation', source: 'Source code', lang: 'Language'},
 };
+const FSDI_STATUS = 'https://docs.geo.admin.ch/page/status-page.html';
 const DOCS = {de: 'https://opendatadocs.meteoswiss.ch/de', fr: 'https://opendatadocs.meteoswiss.ch/fr', it: 'https://opendatadocs.meteoswiss.ch/it', en: 'https://opendatadocs.meteoswiss.ch'};
 
 function initialLocale() {
@@ -35,7 +36,9 @@ function App() {
     <>
       <main className="page">
         <h1>Open Data Status <span className="beta">Beta</span></h1>
-        <p className="intro">{p.intro}</p>
+        <p className="intro">
+          {p.intro} {p.status[0]}<a href={FSDI_STATUS}>{p.status[1]}</a>{p.status[2]}
+        </p>
         <OgdMonitor key={locale} locale={locale} />
       </main>
       <footer className="page footer">

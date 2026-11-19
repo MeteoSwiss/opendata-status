@@ -244,16 +244,36 @@ def latency_from_station_csv(api, item_cfg, now):
     return ref, available, coverage
 
 
+def pause_end(item_cfg, now):
+    """Start of the first month after the most recent seasonal break (None without a break)."""
+    months = set(item_cfg.get("season", {}).get("pause_months", []))
+    if not months:
+        return None
+    y, m = now.year, now.month
+    for _ in range(12):
+        prev = 12 if m == 1 else m - 1
+        if m not in months and prev in months:
+            return dt.datetime(y, m, 1, tzinfo=UTC)
+        y, m = (y - 1, 12) if m == 1 else (y, m - 1)
+    return None
+
+
 def classify(item_cfg, now, updated=None, ref=None, available=None):
-    """Return (status, measured minutes). status: ok, warn, bad, static."""
+    """Return (status, measured minutes). status: ok, warn, bad, pause, static."""
     okm, warnm = item_cfg["ok_max_min"], item_cfg["warn_max_min"]
     if okm is None:
         return "static", None
+    if now.month in item_cfg.get("season", {}).get("pause_months", []):
+        # seasonal break (e.g. phenology in winter): measured, but not rated and not counted
+        return "pause", (max(0.0, minutes(now, updated)) if updated else None)
     if item_cfg["metric"] == "age":
         if not updated:
             return "bad", None
         age = max(0.0, minutes(now, updated))
-        return ("ok" if age <= okm else "warn" if age <= warnm else "bad"), age
+        # after a seasonal break, the expected interval runs from the end of the break
+        start = pause_end(item_cfg, now)
+        rated = min(age, minutes(now, start)) if start and updated < start else age
+        return ("ok" if rated <= okm else "warn" if rated <= warnm else "bad"), age
     if not ref or not available:
         return "bad", None
     lat = max(0.0, minutes(available, ref))
@@ -283,7 +303,7 @@ def apply_corrections(cfg, path, history, history_items):
     for h in history:
         if h["checked"] not in touched:
             continue
-        rs = [r for r in history_items if r["checked"] == h["checked"]]
+        rs = [r for r in history_items if r["checked"] == h["checked"] and r["status"] != "pause"]
         h["monitored_total"] = len(rs)
         h["monitored_ok"] = sum(r["status"] == "ok" for r in rs)
         h["realtime_total"] = sum(r["key"] in realtime for r in rs)
@@ -341,6 +361,8 @@ def main():
         if status == "static":
             continue
         items.append({"checked": checked, "key": c["key"], "status": status, "value_min": value})
+        if status == "pause":
+            continue
         counts["monitored_total"] += 1
         counts["monitored_ok"] += status == "ok"
         if c["realtime"]:

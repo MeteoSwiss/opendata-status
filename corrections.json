@@ -134,6 +134,171 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-13T05:04:38Z",
+   "status": "ok",
+   "value_min": 11529.4,
+   "was": {
+    "status": "warn",
+    "value_min": 11529.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T06:04:47Z",
+   "status": "ok",
+   "value_min": 11589.5,
+   "was": {
+    "status": "warn",
+    "value_min": 11589.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T08:38:54Z",
+   "status": "ok",
+   "value_min": 11743.7,
+   "was": {
+    "status": "warn",
+    "value_min": 11743.7
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T09:16:44Z",
+   "status": "ok",
+   "value_min": 11781.5,
+   "was": {
+    "status": "warn",
+    "value_min": 11781.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T09:38:09Z",
+   "status": "ok",
+   "value_min": 11802.9,
+   "was": {
+    "status": "warn",
+    "value_min": 11802.9
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T10:14:16Z",
+   "status": "ok",
+   "value_min": 11839.0,
+   "was": {
+    "status": "warn",
+    "value_min": 11839.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T10:39:03Z",
+   "status": "ok",
+   "value_min": 11863.8,
+   "was": {
+    "status": "warn",
+    "value_min": 11863.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T11:12:44Z",
+   "status": "ok",
+   "value_min": 11897.5,
+   "was": {
+    "status": "warn",
+    "value_min": 11897.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T11:38:41Z",
+   "status": "ok",
+   "value_min": 11923.4,
+   "was": {
+    "status": "warn",
+    "value_min": 11923.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T12:19:25Z",
+   "status": "ok",
+   "value_min": 11964.2,
+   "was": {
+    "status": "warn",
+    "value_min": 11964.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T12:39:01Z",
+   "status": "ok",
+   "value_min": 11983.8,
+   "was": {
+    "status": "warn",
+    "value_min": 11983.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T13:09:30Z",
+   "status": "ok",
+   "value_min": 12014.3,
+   "was": {
+    "status": "warn",
+    "value_min": 12014.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T13:14:05Z",
+   "status": "ok",
+   "value_min": 12018.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12018.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T13:39:03Z",
+   "status": "ok",
+   "value_min": 12043.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12043.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T14:14:39Z",
+   "status": "ok",
+   "value_min": 12079.4,
+   "was": {
+    "status": "warn",
+    "value_min": 12079.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-13T14:14:39Z",
    "status": "ok",
@@ -143,6 +308,28 @@
     "value_min": 67.2
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T14:38:35Z",
+   "status": "ok",
+   "value_min": 12103.3,
+   "was": {
+    "status": "warn",
+    "value_min": 12103.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T15:13:05Z",
+   "status": "ok",
+   "value_min": 12137.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12137.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -156,6 +343,17 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-13T15:38:05Z",
+   "status": "ok",
+   "value_min": 12162.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12162.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-13T15:38:05Z",
    "status": "ok",
@@ -165,6 +363,28 @@
     "value_min": 67.2
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T15:50:29Z",
+   "status": "ok",
+   "value_min": 12175.2,
+   "was": {
+    "status": "warn",
+    "value_min": 12175.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T16:15:15Z",
+   "status": "ok",
+   "value_min": 12200.0,
+   "was": {
+    "status": "warn",
+    "value_min": 12200.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -178,6 +398,50 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-13T16:39:01Z",
+   "status": "ok",
+   "value_min": 12223.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12223.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T17:12:23Z",
+   "status": "ok",
+   "value_min": 12257.1,
+   "was": {
+    "status": "warn",
+    "value_min": 12257.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T17:38:07Z",
+   "status": "ok",
+   "value_min": 12282.9,
+   "was": {
+    "status": "warn",
+    "value_min": 12282.9
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T18:15:24Z",
+   "status": "ok",
+   "value_min": 12320.2,
+   "was": {
+    "status": "warn",
+    "value_min": 12320.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-13T18:15:24Z",
    "status": "ok",
@@ -187,6 +451,28 @@
     "value_min": 67.3
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T18:38:34Z",
+   "status": "ok",
+   "value_min": 12343.3,
+   "was": {
+    "status": "warn",
+    "value_min": 12343.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T19:11:48Z",
+   "status": "ok",
+   "value_min": 12376.6,
+   "was": {
+    "status": "warn",
+    "value_min": 12376.6
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -200,6 +486,72 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-13T19:38:50Z",
+   "status": "ok",
+   "value_min": 12403.6,
+   "was": {
+    "status": "warn",
+    "value_min": 12403.6
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T20:14:18Z",
+   "status": "ok",
+   "value_min": 12439.1,
+   "was": {
+    "status": "warn",
+    "value_min": 12439.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T20:38:11Z",
+   "status": "ok",
+   "value_min": 12462.9,
+   "was": {
+    "status": "warn",
+    "value_min": 12462.9
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T21:11:03Z",
+   "status": "ok",
+   "value_min": 12495.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12495.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T21:38:17Z",
+   "status": "ok",
+   "value_min": 12523.0,
+   "was": {
+    "status": "warn",
+    "value_min": 12523.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T22:12:19Z",
+   "status": "ok",
+   "value_min": 12557.1,
+   "was": {
+    "status": "warn",
+    "value_min": 12557.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-13T22:12:19Z",
    "status": "ok",
@@ -209,6 +561,28 @@
     "value_min": 66.9
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T22:38:47Z",
+   "status": "ok",
+   "value_min": 12583.5,
+   "was": {
+    "status": "warn",
+    "value_min": 12583.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-13T23:12:39Z",
+   "status": "ok",
+   "value_min": 12617.4,
+   "was": {
+    "status": "warn",
+    "value_min": 12617.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -222,6 +596,116 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-13T23:38:35Z",
+   "status": "ok",
+   "value_min": 12643.3,
+   "was": {
+    "status": "warn",
+    "value_min": 12643.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T00:32:44Z",
+   "status": "ok",
+   "value_min": 12697.5,
+   "was": {
+    "status": "warn",
+    "value_min": 12697.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T00:46:05Z",
+   "status": "ok",
+   "value_min": 12710.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12710.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T01:14:41Z",
+   "status": "ok",
+   "value_min": 12739.4,
+   "was": {
+    "status": "warn",
+    "value_min": 12739.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T01:40:58Z",
+   "status": "ok",
+   "value_min": 12765.7,
+   "was": {
+    "status": "warn",
+    "value_min": 12765.7
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T02:18:13Z",
+   "status": "ok",
+   "value_min": 12803.0,
+   "was": {
+    "status": "warn",
+    "value_min": 12803.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T02:38:13Z",
+   "status": "ok",
+   "value_min": 12823.0,
+   "was": {
+    "status": "warn",
+    "value_min": 12823.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T03:15:39Z",
+   "status": "ok",
+   "value_min": 12860.4,
+   "was": {
+    "status": "warn",
+    "value_min": 12860.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T03:38:36Z",
+   "status": "ok",
+   "value_min": 12883.4,
+   "was": {
+    "status": "warn",
+    "value_min": 12883.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T04:15:04Z",
+   "status": "ok",
+   "value_min": 12919.8,
+   "was": {
+    "status": "warn",
+    "value_min": 12919.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T04:15:04Z",
    "status": "ok",
@@ -231,6 +715,28 @@
     "value_min": 66.8
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T04:38:15Z",
+   "status": "ok",
+   "value_min": 12943.0,
+   "was": {
+    "status": "warn",
+    "value_min": 12943.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T05:13:23Z",
+   "status": "ok",
+   "value_min": 12978.1,
+   "was": {
+    "status": "warn",
+    "value_min": 12978.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -244,6 +750,50 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T05:38:11Z",
+   "status": "ok",
+   "value_min": 13002.9,
+   "was": {
+    "status": "warn",
+    "value_min": 13002.9
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T06:20:20Z",
+   "status": "ok",
+   "value_min": 13045.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13045.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T06:40:19Z",
+   "status": "ok",
+   "value_min": 13065.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13065.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T07:13:21Z",
+   "status": "ok",
+   "value_min": 13098.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13098.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T07:13:21Z",
    "status": "ok",
@@ -253,6 +803,28 @@
     "value_min": 67.5
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T07:38:29Z",
+   "status": "ok",
+   "value_min": 13123.2,
+   "was": {
+    "status": "warn",
+    "value_min": 13123.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T08:15:42Z",
+   "status": "ok",
+   "value_min": 13160.5,
+   "was": {
+    "status": "warn",
+    "value_min": 13160.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -266,6 +838,17 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T08:38:34Z",
+   "status": "ok",
+   "value_min": 13183.3,
+   "was": {
+    "status": "warn",
+    "value_min": 13183.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T08:38:34Z",
    "status": "ok",
@@ -275,6 +858,17 @@
     "value_min": 67.8
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T09:13:25Z",
+   "status": "ok",
+   "value_min": 13218.2,
+   "was": {
+    "status": "warn",
+    "value_min": 13218.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -288,6 +882,50 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T09:39:01Z",
+   "status": "ok",
+   "value_min": 13243.8,
+   "was": {
+    "status": "warn",
+    "value_min": 13243.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T10:12:17Z",
+   "status": "ok",
+   "value_min": 13277.0,
+   "was": {
+    "status": "warn",
+    "value_min": 13277.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T10:38:18Z",
+   "status": "ok",
+   "value_min": 13303.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13303.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T11:11:24Z",
+   "status": "ok",
+   "value_min": 13336.2,
+   "was": {
+    "status": "warn",
+    "value_min": 13336.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T11:11:24Z",
    "status": "ok",
@@ -297,6 +935,72 @@
     "value_min": 68.3
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T11:38:03Z",
+   "status": "ok",
+   "value_min": 13362.8,
+   "was": {
+    "status": "warn",
+    "value_min": 13362.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T12:17:35Z",
+   "status": "ok",
+   "value_min": 13402.3,
+   "was": {
+    "status": "warn",
+    "value_min": 13402.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T12:38:28Z",
+   "status": "ok",
+   "value_min": 13423.2,
+   "was": {
+    "status": "warn",
+    "value_min": 13423.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T13:11:51Z",
+   "status": "ok",
+   "value_min": 13456.6,
+   "was": {
+    "status": "warn",
+    "value_min": 13456.6
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T13:38:56Z",
+   "status": "ok",
+   "value_min": 13483.7,
+   "was": {
+    "status": "warn",
+    "value_min": 13483.7
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T14:12:07Z",
+   "status": "ok",
+   "value_min": 13516.9,
+   "was": {
+    "status": "warn",
+    "value_min": 13516.9
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -310,6 +1014,28 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T14:38:30Z",
+   "status": "ok",
+   "value_min": 13543.3,
+   "was": {
+    "status": "warn",
+    "value_min": 13543.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T15:11:44Z",
+   "status": "ok",
+   "value_min": 13576.5,
+   "was": {
+    "status": "warn",
+    "value_min": 13576.5
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T15:11:44Z",
    "status": "ok",
@@ -319,6 +1045,50 @@
     "value_min": 67.4
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T15:38:19Z",
+   "status": "ok",
+   "value_min": 13603.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13603.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T16:13:36Z",
+   "status": "ok",
+   "value_min": 13638.4,
+   "was": {
+    "status": "warn",
+    "value_min": 13638.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T16:38:23Z",
+   "status": "ok",
+   "value_min": 13663.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13663.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T17:11:14Z",
+   "status": "ok",
+   "value_min": 13696.0,
+   "was": {
+    "status": "warn",
+    "value_min": 13696.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -332,6 +1102,28 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T17:38:27Z",
+   "status": "ok",
+   "value_min": 13723.2,
+   "was": {
+    "status": "warn",
+    "value_min": 13723.2
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T18:14:41Z",
+   "status": "ok",
+   "value_min": 13759.4,
+   "was": {
+    "status": "warn",
+    "value_min": 13759.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T18:14:41Z",
    "status": "ok",
@@ -341,6 +1133,28 @@
     "value_min": 68.7
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T18:38:08Z",
+   "status": "ok",
+   "value_min": 13782.9,
+   "was": {
+    "status": "warn",
+    "value_min": 13782.9
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T19:10:21Z",
+   "status": "ok",
+   "value_min": 13815.1,
+   "was": {
+    "status": "warn",
+    "value_min": 13815.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -354,6 +1168,17 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T19:38:55Z",
+   "status": "ok",
+   "value_min": 13843.7,
+   "was": {
+    "status": "warn",
+    "value_min": 13843.7
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T19:38:55Z",
    "status": "ok",
@@ -363,6 +1188,17 @@
     "value_min": 68.7
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T20:12:41Z",
+   "status": "ok",
+   "value_min": 13877.4,
+   "was": {
+    "status": "warn",
+    "value_min": 13877.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -376,6 +1212,28 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T20:38:50Z",
+   "status": "ok",
+   "value_min": 13903.6,
+   "was": {
+    "status": "warn",
+    "value_min": 13903.6
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T21:11:36Z",
+   "status": "ok",
+   "value_min": 13936.4,
+   "was": {
+    "status": "warn",
+    "value_min": 13936.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-14T21:11:36Z",
    "status": "ok",
@@ -385,6 +1243,50 @@
     "value_min": 67.4
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T21:38:31Z",
+   "status": "ok",
+   "value_min": 13963.3,
+   "was": {
+    "status": "warn",
+    "value_min": 13963.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T22:11:48Z",
+   "status": "ok",
+   "value_min": 13996.6,
+   "was": {
+    "status": "warn",
+    "value_min": 13996.6
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T22:38:03Z",
+   "status": "ok",
+   "value_min": 14022.8,
+   "was": {
+    "status": "warn",
+    "value_min": 14022.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-14T23:11:54Z",
+   "status": "ok",
+   "value_min": 14056.7,
+   "was": {
+    "status": "warn",
+    "value_min": 14056.7
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -398,6 +1300,39 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-14T23:38:52Z",
+   "status": "ok",
+   "value_min": 14083.6,
+   "was": {
+    "status": "warn",
+    "value_min": 14083.6
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T00:37:36Z",
+   "status": "ok",
+   "value_min": 14142.4,
+   "was": {
+    "status": "warn",
+    "value_min": 14142.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T01:14:02Z",
+   "status": "ok",
+   "value_min": 14178.8,
+   "was": {
+    "status": "warn",
+    "value_min": 14178.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-15T01:14:02Z",
    "status": "ok",
@@ -407,6 +1342,50 @@
     "value_min": 67.0
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T01:41:35Z",
+   "status": "ok",
+   "value_min": 14206.3,
+   "was": {
+    "status": "warn",
+    "value_min": 14206.3
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T02:18:37Z",
+   "status": "ok",
+   "value_min": 14243.4,
+   "was": {
+    "status": "warn",
+    "value_min": 14243.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T02:38:54Z",
+   "status": "ok",
+   "value_min": 14263.7,
+   "was": {
+    "status": "warn",
+    "value_min": 14263.7
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T03:16:17Z",
+   "status": "ok",
+   "value_min": 14301.0,
+   "was": {
+    "status": "warn",
+    "value_min": 14301.0
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
@@ -420,6 +1399,28 @@
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
   },
   {
+   "key": "phenology",
+   "checked": "2026-11-15T03:39:04Z",
+   "status": "ok",
+   "value_min": 14323.8,
+   "was": {
+    "status": "warn",
+    "value_min": 14323.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T04:16:00Z",
+   "status": "ok",
+   "value_min": 14360.8,
+   "was": {
+    "status": "warn",
+    "value_min": 14360.8
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
    "key": "pollen",
    "checked": "2026-11-15T04:16:00Z",
    "status": "ok",
@@ -429,6 +1430,28 @@
     "value_min": 66.8
    },
    "reason": "measured from Last-Modified, which pollen files change without new data (fixed 17.11.2026)"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T04:38:19Z",
+   "status": "ok",
+   "value_min": 14383.1,
+   "was": {
+    "status": "warn",
+    "value_min": 14383.1
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
+  },
+  {
+   "key": "phenology",
+   "checked": "2026-11-15T05:13:36Z",
+   "status": "ok",
+   "value_min": 14418.4,
+   "was": {
+    "status": "warn",
+    "value_min": 14418.4
+   },
+   "reason": "phenology is published every 10 days (5th, 15th, 25th), not weekly; rated with the new thresholds"
   },
   {
    "key": "pollen",
