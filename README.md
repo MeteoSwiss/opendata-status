@@ -71,4 +71,3 @@ python3 scripts/ogd_monitor.py --config config.json --data data   # one check in
 - GitHub may delay scheduled runs by a few minutes under load, and disables scheduled workflows in public repositories after 60 days without repository activity. If the history stops, check this first.
 - Each page view sends about 40 small requests to the STAC API and data.geo.admin.ch (about 15 of them station files for the pollen median), repeated every 5 minutes while the page is open. If that is too much, raise `refreshMinutes` (prop of `OgdMonitor`, default 5, set it in `src/main.jsx`).
 - The history files are also public at `https://raw.githubusercontent.com/MeteoSwiss/opendata-status/monitor-data/` and on the page under `data/`.
-- 
