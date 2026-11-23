@@ -64,7 +64,7 @@ const STRINGS = {
     dataset: 'Dataset',
     lastChange: 'Last change',
     howTitle: 'How the values are derived',
-    legend: {ok: 'up to date', warn: 'delayed', bad: 'down', empty: 'no check', pre: 'before monitoring started'},
+    legend: {ok: 'up to date', warn: 'delayed', bad: 'down', empty: 'no check', pre: 'before monitoring started', pause: 'winter break'},
     how: [
       'When this page is opened, and every five minutes while it stays open, your browser asks the FSDI STAC API for the most recently updated item of each collection.',
       'For products with a latency target, the publication latency is measured instead: the time from the reference time of the newest data (time stamp in the file name, or newest value in the station file) until it is available. Such a product also counts as down when no new data arrives.',
@@ -135,7 +135,7 @@ const STRINGS = {
     dataset: 'Datensatz',
     lastChange: 'Letzte Änderung',
     howTitle: 'Wie die Werte entstehen',
-    legend: {ok: 'aktuell', warn: 'verzögert', bad: 'ausgefallen', empty: 'keine Prüfung', pre: 'vor Messbeginn'},
+    legend: {ok: 'aktuell', warn: 'verzögert', bad: 'ausgefallen', empty: 'keine Prüfung', pre: 'vor Messbeginn', pause: 'Winterpause'},
     how: [
       'Beim Öffnen dieser Seite und danach alle fünf Minuten fragt Ihr Browser die STAC API der FSDI nach dem zuletzt aktualisierten Item jeder Collection.',
       'Für Produkte mit einem Latenzziel wird stattdessen die Publikationslatenz gemessen: die Zeit vom Referenzzeitpunkt der neuesten Daten (Zeitstempel im Dateinamen bzw. neuester Wert in der Stationsdatei) bis zu ihrer Verfügbarkeit. Kommen keine neuen Daten mehr, gilt ein solches Produkt ebenfalls als ausgefallen.',
@@ -206,7 +206,7 @@ const STRINGS = {
     dataset: 'Jeu de données',
     lastChange: 'Dernière modification',
     howTitle: 'Comment les valeurs sont obtenues',
-    legend: {ok: 'à jour', warn: 'en retard', bad: 'interrompu', empty: 'aucun contrôle', pre: 'avant la surveillance'},
+    legend: {ok: 'à jour', warn: 'en retard', bad: 'interrompu', empty: 'aucun contrôle', pre: 'avant la surveillance', pause: 'pause hivernale'},
     how: [
       'À l’ouverture de cette page, puis toutes les cinq minutes, votre navigateur demande à la STAC API de l’IFDG l’item le plus récemment mis à jour de chaque collection.',
       'Pour les produits ayant un objectif de latence, c’est la latence de publication qui est mesurée : le temps entre l’heure de référence des données les plus récentes (horodatage dans le nom du fichier ou dernière valeur du fichier de station) et leur disponibilité. Si aucune nouvelle donnée n’arrive, le produit est également considéré comme interrompu.',
@@ -277,7 +277,7 @@ const STRINGS = {
     dataset: 'Set di dati',
     lastChange: 'Ultima modifica',
     howTitle: 'Come vengono ottenuti i valori',
-    legend: {ok: 'aggiornato', warn: 'in ritardo', bad: 'interrotto', empty: 'nessun controllo', pre: 'prima del monitoraggio'},
+    legend: {ok: 'aggiornato', warn: 'in ritardo', bad: 'interrotto', empty: 'nessun controllo', pre: 'prima del monitoraggio', pause: 'pausa invernale'},
     how: [
       'All’apertura di questa pagina, e poi ogni cinque minuti, il vostro browser chiede alla STAC API dell’IFDG l’item aggiornato più di recente di ogni collezione.',
       'Per i prodotti con un obiettivo di latenza viene invece misurata la latenza di pubblicazione: il tempo tra l’ora di riferimento dei dati più recenti (marca temporale nel nome del file o ultimo valore nel file della stazione) e la loro disponibilità. Se non arrivano nuovi dati, il prodotto è considerato interrotto.',

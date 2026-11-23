@@ -169,7 +169,18 @@ async function measure(api, c) {
       const v = parseRef(l.split(';')[i]);
       if (v && (!ref || v > ref)) ref = v;
     });
-    return {ref, available: assetTime(nowAsset(feature)) || (lm ? new Date(lm) : null)};
+    const available = assetTime(nowAsset(feature));
+    const modified = lm ? new Date(lm) : null;
+    if (!available) return {ref, available: modified};
+    // The CDN keeps some files for up to two hours (pollen: max-age=7200), so this copy can be older
+    // than the update on the STAC API. Then estimate the newest reference time as the start of the
+    // interval in which the update happened.
+    if (modified && available - modified > 60e3) {
+      const step = c.interval_min * 60e3;
+      const estimate = new Date(Math.floor(available / step) * step);
+      if (!ref || estimate > ref) ref = estimate;
+    }
+    return {ref, available};
   };
 
   if (station !== 'latest') {
@@ -550,6 +561,11 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
       <div className={styles.section}>
         <p className={styles.h2}>{t.overview}</p>
         <p className={`${styles.small} ${styles.sub2}`}>{t.overviewSub}</p>
+        <div className={`${styles.legend} ${styles.legendTop}`}>
+          {['ok', 'warn', 'bad', 'pause', 'empty', 'pre'].map((k) => (
+            <span key={k}><i className={`${styles.swatch} ${styles[k]}`} />{t.legend[k]}</span>
+          ))}
+        </div>
         {history && history.error && <p className={styles.notice}>{t.historyMissing}</p>}
         <div className={styles.bars}>
           {GROUPS.map((g) => {
@@ -642,11 +658,6 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
       <details className={styles.details}>
         <summary>{t.howTitle}</summary>
         <div className={styles.detailBody}>
-          <div className={styles.legend}>
-            {['ok', 'warn', 'bad', 'empty', 'pre'].map((k) => (
-              <span key={k}><i className={`${styles.swatch} ${styles[k]}`} />{t.legend[k]}</span>
-            ))}
-          </div>
           {t.how.map((p, i) => <p key={i}>{p}</p>)}
         </div>
       </details>

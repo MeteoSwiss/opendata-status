@@ -47,7 +47,7 @@ function App() {
             ? <strong key={l}>{l.toUpperCase()}</strong>
             : <a key={l} href={`?lang=${l}`} hrefLang={l} onClick={choose(l)}>{l.toUpperCase()}</a>))}
         </nav>
-        <span><a href={DOCS[locale]}>{p.docs}</a> · <a href={window.SOURCE_URL || '#'}>{p.source}</a></span>
+        <span><a href={DOCS[locale]}>{p.docs}</a> · <a href="api/v1/status.json" type="application/json">JSON</a> · <a href={window.SOURCE_URL || '#'}>{p.source}</a></span>
       </footer>
     </>
   );
