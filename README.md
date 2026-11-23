@@ -23,7 +23,7 @@ How up to date the MeteoSwiss open data are on the [STAC API](https://data.geo.a
 
 Per item one of two metrics (`metric` in `config.json`):
 
-- `age`: time since the newest data of the collection. Usually the item's last update; with `"source": {"kind": "newest_asset"}` the creation time of the newest file (used for radar hail).
+- `age`: time since the newest data of the collection were published. Usually the item's last update; with `"source": {"kind": "newest_asset"}` the creation time of the newest file (used for radar hail).
 - `latency`: publication latency, from the reference time of the newest data to its availability on the STAC API.
   - Reference time from the file name (radar, local forecasts) or from the newest `reference_timestamp` in a station's `*_now.csv` (single stations, pollen).
   - Availability is the `created` / `updated` time of the file on the STAC API. The HTTP `Last-Modified` is only a fallback: some files are rewritten without new data.
@@ -61,7 +61,7 @@ Items in their winter break are still measured and shown in grey, but do not cou
 | `status` | Overall status of all rated datasets: `ok`, `warn` (at least one delayed) or `bad` (at least one down) |
 | `summary` | Datasets up to date (`monitored`, `realtime`) and the share of checks in the last 30 days in which all were up to date |
 | `groups[]` | Status per group A–E with `total` and `ok` |
-| `items[]` | One entry per dataset: `key`, `name` (de/fr/it/en), `group`, `collection`, `documentation`, `metric`, `interval`, `status` (`ok`, `warn`, `bad`, `pause`, `static`), `value_min` (age or latency in minutes), `target_min`, `limit_min`, `newest_data`, `available`, share of checks with status ok in the last 24 hours and 30 days (`ok_share_24h_pct`, `ok_share_30d_pct`), for pollen also `stations` |
+| `items[]` | One entry per dataset: `key`, `name` (de/fr/it/en), `group`, `collection`, `documentation`, `metric`, `interval`, `status` (`ok`, `warn`, `bad`, `pause`, `static`), `value_min` (age or latency in minutes), `target_min`, `limit_min`, `reference_time` (latency: time the newest data refer to), `published` (when the newest data became available on the STAC API), `model_run` (forecast models: reference time of the run), share of checks with status ok in the last 24 hours and 30 days (`ok_share_24h_pct`, `ok_share_30d_pct`), for pollen also `stations` |
 | `links` | Page, history files and STAC API |
 
 Example: `curl -s https://meteoswiss.github.io/opendata-status/api/v1/status.json | jq '.items[] | select(.status != "ok") | .key'`
