@@ -16,6 +16,7 @@ Two kinds of checks, set per item in the configuration:
 
 Reads the existing history files from <data-dir> (if present) and writes:
     status.json         latest check, one row per item
+    api-status.json     public JSON endpoint (published as api/v1/status.json), see README
     history.json        one row per check: how many real-time / monitored items were up to date
     history_items.json  one row per check and monitored item: status and measured minutes
 History is kept for RETENTION_DAYS. Only the Python standard library is used.
@@ -208,10 +209,20 @@ def latency_from_station_csv(api, item_cfg, now):
         i = lines[0].split(";").index("reference_timestamp")
         refs = [parse_ref(l.split(";")[i]) for l in lines[1:] if len(l.split(";")) > i]
         refs = [r for r in refs if r]
+        ref = max(refs) if refs else None
         available = asset_updated(now_asset(feature, suffix))
-        if not available and lm:
-            available = email.utils.parsedate_to_datetime(lm).astimezone(UTC)
-        return (max(refs) if refs else None), available
+        modified = email.utils.parsedate_to_datetime(lm).astimezone(UTC) if lm else None
+        if not available:
+            return ref, modified
+        # The CDN keeps some files for up to two hours (pollen: Cache-Control max-age=7200), so the copy
+        # we get can be older than the update on the STAC API. Then the newest reference time is not in
+        # our copy: estimate it as the start of the interval in which the update happened.
+        if modified and (available - modified).total_seconds() > 60:
+            step = item_cfg["interval_min"] * 60
+            estimate = dt.datetime.fromtimestamp(available.timestamp() // step * step, UTC)
+            if not ref or estimate > ref:
+                ref = estimate
+        return ref, available
 
     if station != "latest":
         ref, available = measure_station(get_item(api, coll, station))
@@ -311,6 +322,82 @@ def apply_corrections(cfg, path, history, history_items):
     print(f"corrections applied to {len(touched)} checks")
 
 
+DOCS = "https://opendatadocs.meteoswiss.ch"
+API_VERSION = 1
+
+
+def api_status(cfg, rows, history, history_items, now, checked):
+    """Public status document (api/v1/status.json): the latest check with names, links and targets,
+    plus the share of checks with status ok per item over the last 24 hours and 30 days."""
+    by_key = {c["key"]: c for c in cfg["items"]}
+    # absolute links on GitHub Pages (owner.github.io/repo/), relative ones elsewhere
+    repo = os.environ.get("GITHUB_REPOSITORY", "")
+    base = f"https://{repo.split('/')[0].lower()}.github.io/{repo.split('/')[1]}/" if "/" in repo else "../../"
+
+    def share(key, hours):
+        rs = [r for r in history_items if r["key"] == key and r["status"] != "pause"
+              and (now - parse_iso(r["checked"])).total_seconds() <= hours * 3600]
+        return round(100 * sum(r["status"] == "ok" for r in rs) / len(rs), 1) if rs else None
+
+    def iso(v):
+        return v if v is None or isinstance(v, str) else v.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    items = []
+    for r in rows:
+        c = by_key[r["key"]]
+        rated = r["status"] not in ("static", "pause")
+        item = {
+            "key": c["key"],
+            "name": c["name"],
+            "group": c["group"],
+            "collection": c["collection"],
+            "documentation": (DOCS + c["doc"]) if c.get("doc") else None,
+            "realtime": bool(c.get("realtime")),
+            "metric": c["metric"],
+            "interval": c.get("interval"),
+            "status": r["status"],
+            "value_min": r["value_min"],
+            "target_min": c.get("ok_max_min"),
+            "limit_min": c.get("warn_max_min"),
+            "newest_data": iso(r["ref_time"] if c["metric"] == "latency" else r["updated"]),
+            "available": iso(r["available"]),
+            "ok_share_24h_pct": share(c["key"], 24) if rated else None,
+            "ok_share_30d_pct": share(c["key"], 24 * 30) if rated else None,
+        }
+        if "stations_total" in r:
+            item["stations"] = {"total": r["stations_total"], "ok": r["stations_ok"], "not_up_to_date": r["stations_stale"]}
+        items.append(item)
+
+    rated = [i for i in items if i["status"] in ("ok", "warn", "bad")]
+    worst = lambda xs: "bad" if any(x["status"] == "bad" for x in xs) else "warn" if any(x["status"] == "warn" for x in xs) else "ok"
+    groups = []
+    for g in sorted({i["group"] for i in items}):
+        gi = [i for i in rated if i["group"] == g]
+        if gi:
+            groups.append({"group": g, "status": worst(gi), "total": len(gi), "ok": sum(i["status"] == "ok" for i in gi)})
+    rt = [i for i in rated if i["realtime"]]
+    last = history[-1] if history else {}
+    month = [h for h in history if (now - parse_iso(h["checked"])).days < 30 and h.get("monitored_total")]
+    return {
+        "api_version": API_VERSION,
+        "checked": checked,
+        "status": worst(rated),
+        "summary": {
+            "monitored": {"total": len(rated), "ok": sum(i["status"] == "ok" for i in rated)},
+            "realtime": {"total": len(rt), "ok": sum(i["status"] == "ok" for i in rt)},
+            "all_ok_share_30d_pct": round(100 * sum(h["monitored_ok"] == h["monitored_total"] for h in month) / len(month), 1) if month else None,
+        },
+        "groups": groups,
+        "items": items,
+        "links": {
+            "page": base,
+            "history": base + "data/history.json",
+            "history_items": base + "data/history_items.json",
+            "stac_api": cfg.get("stac_api", "https://data.geo.admin.ch/api/stac/v1"),
+        },
+    }
+
+
 def load(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -385,6 +472,7 @@ def main():
             json.dump(data, f, ensure_ascii=False, **({"separators": (",", ":")} if compact else {"indent": 1}))
 
     dump("status.json", rows)
+    dump("api-status.json", api_status(cfg, rows, history, history_items, now, checked))
     dump("history.json", history)
     dump("history_items.json", history_items, compact=True)
     print(f"{checked}: real-time up to date {counts['realtime_ok']}/{counts['realtime_total']}, "
