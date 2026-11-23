@@ -28,6 +28,9 @@ import json
 import os
 import re
 import sys
+import time
+import urllib.error
+import urllib.parse
 import urllib.request
 
 RETENTION_DAYS = 30
@@ -66,6 +69,12 @@ def dated_items(api, collection, n=1):
     stalled. So: take the recently updated items, drop empty ones and order them by id (= date)."""
     feats = [f for f in newest_items(api, collection, 6) if f.get("assets")]
     return sorted(feats, key=lambda f: f["id"], reverse=True)[:n]
+
+
+def newest_filled_item(api, collection):
+    """Most recently updated item that holds files (empty placeholder items, e.g. for the next
+    month, are created ahead of time and would make the data look fresh)."""
+    return next((f for f in newest_items(api, collection, 6) if f.get("assets")), None)
 
 
 def newest_asset_time(api, collection):
@@ -134,6 +143,48 @@ def latency_from_assets(api, item_cfg, now):
         if len(runs[ref]) >= expected:
             return ref, max(runs[ref]), {"files": len(runs[ref]), "expected": expected, "complete": True}
     return newest, now, {"files": len(runs[newest]), "expected": expected, "complete": False}
+
+
+def newest_file(api, item_cfg):
+    """Download URL of the newest file of an item (None where the measurement already read a file)."""
+    src = item_cfg.get("source", {})
+    coll = item_cfg["collection"]
+    if src.get("kind") == "station_now_csv":
+        return None
+    if src.get("kind") == "asset_name":
+        feats, key = dated_items(api, coll, 2), lambda name, a: (ref_time_from_name(name, src), a.get("created") or "")
+    elif src.get("kind") == "newest_asset":
+        feats, key = dated_items(api, coll, 1), lambda name, a: (True, a.get("created") or a.get("updated") or "")
+    else:
+        feats, key = [f for f in [newest_filled_item(api, coll)] if f], lambda name, a: (True, a.get("created") or a.get("updated") or "")
+    best = None
+    for f in feats:
+        for name, a in f.get("assets", {}).items():
+            k = key(name, a)
+            if k[0] and a.get("href") and (best is None or k > best[0]):
+                best = (k, a["href"])
+    return best[1] if best else None
+
+
+def check_access(url, tries=2):
+    """Fetch the first kilobyte of a file, as a user would: is it actually downloadable?
+
+    Returns {"ok", "host", "http_status"} (plus "error"); signed URLs are never stored."""
+    host = urllib.parse.urlsplit(url).hostname
+    result = {}
+    for attempt in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={**UA, "Range": "bytes=0-1023"})
+            with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:
+                body = r.read(1024)
+                return {"ok": r.status in (200, 206) and len(body) > 0, "host": host, "http_status": r.status}
+        except urllib.error.HTTPError as e:
+            result = {"ok": False, "host": host, "http_status": e.code, "error": f"HTTP {e.code}"}
+        except Exception as e:  # timeout, DNS, TLS, connection refused
+            result = {"ok": False, "host": host, "http_status": None, "error": type(e).__name__}
+        if attempt + 1 < tries:
+            time.sleep(5)
+    return result
 
 
 def parse_ref(s):
@@ -368,6 +419,8 @@ def api_status(cfg, rows, history, history_items, now, checked):
         }
         if r.get("model_run"):
             item["model_run"] = r["model_run"]
+        if r.get("access"):
+            item["access"] = r["access"]
         if "stations_total" in r:
             item["stations"] = {"total": r["stations_total"], "ok": r["stations_ok"], "not_up_to_date": r["stations_stale"]}
         items.append(item)
@@ -434,7 +487,7 @@ def main():
                 if c.get("source", {}).get("kind") == "newest_asset":
                     updated = newest_asset_time(api, c["collection"])
                 else:
-                    f = newest_item(api, c["collection"])
+                    f = newest_filled_item(api, c["collection"])
                     updated = parse_iso(f["properties"]["updated"]) if f else None
                     # forecast models: the run the newest files belong to
                     model_run = (f or {}).get("properties", {}).get("forecast:reference_datetime")
@@ -446,12 +499,28 @@ def main():
             print(f"warning: {c['key']}: {e}", file=sys.stderr)
             failures += 1
         status, value = classify(c, now, updated, ref, available)
+        # can users actually download the newest file? (catalog entries alone say nothing about storage)
+        access = None
+        if status in ("ok", "warn", "pause"):
+            try:
+                url = newest_file(api, c)
+                if url:
+                    access = check_access(url)
+                elif c.get("source", {}).get("kind") == "station_now_csv" and ref:
+                    access = {"ok": True, "host": urllib.parse.urlsplit(FILES).hostname, "http_status": 200}
+            except Exception as e:
+                print(f"warning: {c['key']}: access check: {e}", file=sys.stderr)
+            if access and not access["ok"]:
+                print(f"  {c['key']}: newest file not downloadable ({access.get('error')}, {access['host']})")
+                if status != "pause":
+                    status = "bad"
         rows.append({"key": c["key"], "collection": c["collection"], "group": c["group"], "metric": c["metric"],
                      "updated": iso(updated), "ref_time": iso(ref), "available": iso(available),
                      "value_min": value, "status": status, "checked": checked,
                      **({"run_files": run["files"], "run_files_expected": run["expected"], "run_complete": run["complete"]} if run else {}),
                      **({"stations_total": coverage["total"], "stations_ok": coverage["ok"], "stations_stale": coverage["stale"]} if coverage else {}),
-                     **({"model_run": model_run} if model_run else {})})
+                     **({"model_run": model_run} if model_run else {}),
+                     **({"access": access} if access else {})})
         if status == "static":
             continue
         items.append({"checked": checked, "key": c["key"], "status": status, "value_min": value})
