@@ -1837,6 +1837,1216 @@
     "value_min": 0.4
    },
    "reason": "recomputed from the asset creation times on the STAC API (wrong daily item picked)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T12:19:50Z",
+   "status": "ok",
+   "value_min": 18.3,
+   "was": {
+    "status": "bad",
+    "value_min": 318.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T14:39:18Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 137.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T15:38:56Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T16:39:03Z",
+   "status": "ok",
+   "value_min": 17.7,
+   "was": {
+    "status": "warn",
+    "value_min": 137.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T17:12:32Z",
+   "status": "ok",
+   "value_min": 17.7,
+   "was": {
+    "status": "warn",
+    "value_min": 77.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T18:39:03Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T19:10:59Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T19:38:24Z",
+   "status": "ok",
+   "value_min": 17.3,
+   "was": {
+    "status": "warn",
+    "value_min": 137.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T20:14:38Z",
+   "status": "ok",
+   "value_min": 17.3,
+   "was": {
+    "status": "warn",
+    "value_min": 137.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T21:38:05Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-18T23:38:20Z",
+   "status": "ok",
+   "value_min": 16.8,
+   "was": {
+    "status": "warn",
+    "value_min": 76.8
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T00:35:10Z",
+   "status": "ok",
+   "value_min": 16.8,
+   "was": {
+    "status": "warn",
+    "value_min": 136.8
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T00:50:44Z",
+   "status": "ok",
+   "value_min": 16.8,
+   "was": {
+    "status": "warn",
+    "value_min": 136.8
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T02:18:33Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 137.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T03:16:18Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T03:39:04Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T04:16:17Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T05:38:42Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T07:38:28Z",
+   "status": "ok",
+   "value_min": 18.1,
+   "was": {
+    "status": "warn",
+    "value_min": 78.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T08:18:33Z",
+   "status": "ok",
+   "value_min": 18.5,
+   "was": {
+    "status": "warn",
+    "value_min": 138.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T08:39:20Z",
+   "status": "ok",
+   "value_min": 18.5,
+   "was": {
+    "status": "warn",
+    "value_min": 138.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T11:38:55Z",
+   "status": "ok",
+   "value_min": 18.5,
+   "was": {
+    "status": "warn",
+    "value_min": 78.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T12:19:33Z",
+   "status": "ok",
+   "value_min": 17.3,
+   "was": {
+    "status": "warn",
+    "value_min": 77.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T12:28:20Z",
+   "status": "ok",
+   "value_min": 17.3,
+   "was": {
+    "status": "warn",
+    "value_min": 77.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T13:38:57Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T14:14:57Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T15:38:30Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T16:15:17Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T16:38:48Z",
+   "status": "ok",
+   "value_min": 17.9,
+   "was": {
+    "status": "warn",
+    "value_min": 137.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T17:38:45Z",
+   "status": "ok",
+   "value_min": 17.5,
+   "was": {
+    "status": "warn",
+    "value_min": 77.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T19:11:15Z",
+   "status": "ok",
+   "value_min": 18.6,
+   "was": {
+    "status": "warn",
+    "value_min": 78.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T20:14:45Z",
+   "status": "ok",
+   "value_min": 20.0,
+   "was": {
+    "status": "warn",
+    "value_min": 140.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T21:12:42Z",
+   "status": "ok",
+   "value_min": 17.3,
+   "was": {
+    "status": "warn",
+    "value_min": 77.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-19T23:38:39Z",
+   "status": "ok",
+   "value_min": 16.7,
+   "was": {
+    "status": "warn",
+    "value_min": 76.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T00:32:33Z",
+   "status": "ok",
+   "value_min": 16.6,
+   "was": {
+    "status": "warn",
+    "value_min": 136.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T02:18:41Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T02:38:39Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 137.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T03:38:18Z",
+   "status": "ok",
+   "value_min": 16.8,
+   "was": {
+    "status": "warn",
+    "value_min": 136.8
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T04:38:48Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T06:22:55Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 137.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T06:43:42Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T07:16:03Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T08:18:31Z",
+   "status": "ok",
+   "value_min": 18.1,
+   "was": {
+    "status": "warn",
+    "value_min": 78.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T09:15:30Z",
+   "status": "ok",
+   "value_min": 18.1,
+   "was": {
+    "status": "warn",
+    "value_min": 78.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T09:38:44Z",
+   "status": "ok",
+   "value_min": 17.5,
+   "was": {
+    "status": "warn",
+    "value_min": 137.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T11:13:23Z",
+   "status": "ok",
+   "value_min": 17.9,
+   "was": {
+    "status": "warn",
+    "value_min": 77.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T12:19:50Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T13:13:53Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T13:38:52Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T15:14:08Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T16:14:25Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T17:11:33Z",
+   "status": "ok",
+   "value_min": 18.0,
+   "was": {
+    "status": "warn",
+    "value_min": 78.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T18:16:31Z",
+   "status": "ok",
+   "value_min": 17.3,
+   "was": {
+    "status": "warn",
+    "value_min": 77.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T18:38:29Z",
+   "status": "ok",
+   "value_min": 18.3,
+   "was": {
+    "status": "warn",
+    "value_min": 138.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T19:12:05Z",
+   "status": "ok",
+   "value_min": 18.3,
+   "was": {
+    "status": "warn",
+    "value_min": 78.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T20:38:19Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T21:12:20Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T22:38:47Z",
+   "status": "ok",
+   "value_min": 16.9,
+   "was": {
+    "status": "warn",
+    "value_min": 76.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-20T23:12:40Z",
+   "status": "ok",
+   "value_min": 16.9,
+   "was": {
+    "status": "warn",
+    "value_min": 76.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T01:41:35Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T02:18:03Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 137.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T03:38:51Z",
+   "status": "ok",
+   "value_min": 16.7,
+   "was": {
+    "status": "warn",
+    "value_min": 76.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T04:15:55Z",
+   "status": "ok",
+   "value_min": 16.7,
+   "was": {
+    "status": "warn",
+    "value_min": 76.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T06:20:48Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 137.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T09:38:47Z",
+   "status": "ok",
+   "value_min": 17.5,
+   "was": {
+    "status": "warn",
+    "value_min": 77.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T10:12:26Z",
+   "status": "ok",
+   "value_min": 17.5,
+   "was": {
+    "status": "warn",
+    "value_min": 77.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T12:18:22Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T14:38:15Z",
+   "status": "ok",
+   "value_min": 17.6,
+   "was": {
+    "status": "warn",
+    "value_min": 77.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T15:11:44Z",
+   "status": "ok",
+   "value_min": 17.6,
+   "was": {
+    "status": "warn",
+    "value_min": 77.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T18:38:44Z",
+   "status": "ok",
+   "value_min": 18.8,
+   "was": {
+    "status": "warn",
+    "value_min": 78.8
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T20:13:07Z",
+   "status": "ok",
+   "value_min": 20.9,
+   "was": {
+    "status": "warn",
+    "value_min": 80.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T21:11:35Z",
+   "status": "ok",
+   "value_min": 17.8,
+   "was": {
+    "status": "warn",
+    "value_min": 77.8
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T22:38:07Z",
+   "status": "ok",
+   "value_min": 17.4,
+   "was": {
+    "status": "warn",
+    "value_min": 77.4
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-21T23:38:45Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T02:19:41Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T02:38:46Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T04:38:51Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T05:13:42Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T06:21:00Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T07:38:49Z",
+   "status": "ok",
+   "value_min": 17.5,
+   "was": {
+    "status": "warn",
+    "value_min": 77.5
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T09:38:14Z",
+   "status": "ok",
+   "value_min": 18.0,
+   "was": {
+    "status": "warn",
+    "value_min": 138.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T10:12:45Z",
+   "status": "ok",
+   "value_min": 18.0,
+   "was": {
+    "status": "warn",
+    "value_min": 78.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T11:38:25Z",
+   "status": "ok",
+   "value_min": 18.7,
+   "was": {
+    "status": "warn",
+    "value_min": 78.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T12:17:45Z",
+   "status": "ok",
+   "value_min": 16.7,
+   "was": {
+    "status": "warn",
+    "value_min": 136.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T15:38:04Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T16:37:56Z",
+   "status": "ok",
+   "value_min": 18.0,
+   "was": {
+    "status": "warn",
+    "value_min": 78.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T18:38:07Z",
+   "status": "ok",
+   "value_min": 18.3,
+   "was": {
+    "status": "warn",
+    "value_min": 78.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T19:11:23Z",
+   "status": "ok",
+   "value_min": 18.3,
+   "was": {
+    "status": "warn",
+    "value_min": 78.3
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T19:38:03Z",
+   "status": "ok",
+   "value_min": 18.6,
+   "was": {
+    "status": "warn",
+    "value_min": 138.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T20:38:50Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T21:11:44Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T22:12:20Z",
+   "status": "ok",
+   "value_min": 16.9,
+   "was": {
+    "status": "warn",
+    "value_min": 136.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T22:38:08Z",
+   "status": "ok",
+   "value_min": 16.7,
+   "was": {
+    "status": "warn",
+    "value_min": 76.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-22T23:37:58Z",
+   "status": "ok",
+   "value_min": 16.9,
+   "was": {
+    "status": "warn",
+    "value_min": 136.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T01:41:53Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T02:20:49Z",
+   "status": "ok",
+   "value_min": 16.9,
+   "was": {
+    "status": "warn",
+    "value_min": 136.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T04:18:13Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 137.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T04:40:18Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T05:16:11Z",
+   "status": "ok",
+   "value_min": 17.0,
+   "was": {
+    "status": "warn",
+    "value_min": 77.0
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T06:53:09Z",
+   "status": "ok",
+   "value_min": 16.9,
+   "was": {
+    "status": "warn",
+    "value_min": 76.9
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T07:18:10Z",
+   "status": "ok",
+   "value_min": 17.7,
+   "was": {
+    "status": "warn",
+    "value_min": 77.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T07:38:42Z",
+   "status": "ok",
+   "value_min": 17.7,
+   "was": {
+    "status": "warn",
+    "value_min": 77.7
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T08:20:54Z",
+   "status": "ok",
+   "value_min": 18.2,
+   "was": {
+    "status": "warn",
+    "value_min": 138.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T09:39:56Z",
+   "status": "ok",
+   "value_min": 17.6,
+   "was": {
+    "status": "warn",
+    "value_min": 77.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T10:14:35Z",
+   "status": "ok",
+   "value_min": 17.6,
+   "was": {
+    "status": "warn",
+    "value_min": 77.6
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T10:38:48Z",
+   "status": "ok",
+   "value_min": 19.2,
+   "was": {
+    "status": "warn",
+    "value_min": 139.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T11:12:21Z",
+   "status": "ok",
+   "value_min": 19.2,
+   "was": {
+    "status": "warn",
+    "value_min": 79.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T13:16:08Z",
+   "status": "ok",
+   "value_min": 17.1,
+   "was": {
+    "status": "warn",
+    "value_min": 77.1
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T13:38:47Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
+  },
+  {
+   "key": "pollen",
+   "checked": "2026-11-23T14:16:06Z",
+   "status": "ok",
+   "value_min": 17.2,
+   "was": {
+    "status": "warn",
+    "value_min": 77.2
+   },
+   "reason": "station file read from a CDN copy up to two hours old (pollen max-age 7200 s); latency recomputed as value mod 60 min (fixed 23.11.2026)"
   }
  ]
 }

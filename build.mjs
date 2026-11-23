@@ -1,4 +1,4 @@
-// Builds the static page into dist/: index.html, assets/main.{js,css}, config.json, data/.
+// Builds the static page into dist/: index.html, assets/main.{js,css}, config.json, data/, api/v1/status.json.
 // `npm start` serves it on http://localhost:8000 with local data from ./data or ./seed.
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
@@ -18,6 +18,12 @@ for (const dir of ['data', 'seed']) {
     for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) fs.copyFileSync(`${dir}/${f}`, `dist/data/${f}`);
     break;
   }
+}
+
+// public JSON endpoint: written by scripts/ogd_monitor.py, published as api/v1/status.json
+if (fs.existsSync('data/api-status.json')) {
+  fs.mkdirSync('dist/api/v1', {recursive: true});
+  fs.copyFileSync('data/api-status.json', 'dist/api/v1/status.json');
 }
 
 const options = {
