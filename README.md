@@ -50,6 +50,24 @@ Items in their winter break are still measured and shown in grey, but do not cou
 - **Opening a group** shows its datasets with key figure, status and their own strip. Deep links open the group: `#group-D` or `#monitor-<key>`, e.g. `#monitor-radar-rzc`.
 - **Notes**: the intro links to the operational status of geo.admin.ch, group A to the data availability of the ground-based stations.
 
+## JSON endpoint
+
+**https://meteoswiss.github.io/opendata-status/api/v1/status.json**, updated with every check (every 30 minutes). The live status on the page can be newer.
+
+| Field | Content |
+|:--|:--|
+| `api_version` | `1`; fields are only added within a version |
+| `checked` | Time of the check (UTC) |
+| `status` | Overall status of all rated datasets: `ok`, `warn` (at least one delayed) or `bad` (at least one down) |
+| `summary` | Datasets up to date (`monitored`, `realtime`) and the share of checks in the last 30 days in which all were up to date |
+| `groups[]` | Status per group A–E with `total` and `ok` |
+| `items[]` | One entry per dataset: `key`, `name` (de/fr/it/en), `group`, `collection`, `documentation`, `metric`, `interval`, `status` (`ok`, `warn`, `bad`, `pause`, `static`), `value_min` (age or latency in minutes), `target_min`, `limit_min`, `newest_data`, `available`, share of checks with status ok in the last 24 hours and 30 days (`ok_share_24h_pct`, `ok_share_30d_pct`), for pollen also `stations` |
+| `links` | Page, history files and STAC API |
+
+Example: `curl -s https://meteoswiss.github.io/opendata-status/api/v1/status.json | jq '.items[] | select(.status != "ok") | .key'`
+
+The history is available as `data/history.json` (per check) and `data/history_items.json` (per check and dataset).
+
 <!-- ## Setup
 
 1. Settings › Pages › Build and deployment › Source: **GitHub Actions**.
