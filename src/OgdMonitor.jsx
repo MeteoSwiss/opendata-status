@@ -98,7 +98,9 @@ async function measure(api, c) {
         Object.values(f.assets).map((a) => a.created || a.updated).filter(Boolean).map((v) => +new Date(v)));
       return {updated: times.length ? new Date(Math.max(...times)) : null};
     }
-    const f = await fetchNewest(api, c.collection);
+    // most recently updated item that holds files: empty placeholder items (e.g. for the next month)
+    // are created ahead of time and would make the data look fresh
+    const f = (await fetchNewestN(api, c.collection, 6)).find((x) => Object.keys(x.assets || {}).length);
     // forecast models: the run the newest files belong to (their reference time)
     const run = f && f.properties['forecast:reference_datetime'];
     return {updated: f ? new Date(f.properties.updated) : null, modelRun: run ? new Date(run) : null};
@@ -257,23 +259,6 @@ async function fetchDated(api, id, n) {
   return fs.slice(0, n);
 }
 
-// Newest item of a collection; requests for the same collection within one check are shared
-const pending = new Map();
-function fetchNewest(api, id) {
-  if (!pending.has(id)) {
-    pending.set(id, fetch(`${api}/search`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      cache: 'no-store',
-      body: JSON.stringify({collections: [id], limit: 1, sortby: [{field: 'properties.updated', direction: 'desc'}]}),
-    }).then((r) => {
-      if (!r.ok) throw new Error(`STAC ${r.status}`);
-      return r.json();
-    }).then((j) => (j.features || [])[0] || null));
-  }
-  return pending.get(id);
-}
-
 // All items (stations) of a collection in one request
 async function fetchAllItems(api, id) {
   const r = await fetch(`${api}/search`, {
@@ -395,7 +380,6 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   }, []);
 
   const loadLive = useCallback(async () => {
-    pending.clear();
     const results = await Promise.allSettled(config.items.map((c) => measure(config.stac_api, c)));
     const m = {};
     config.items.forEach((c, i) => {
@@ -406,11 +390,13 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
 
   const loadHistory = useCallback(async () => {
     try {
-      const [summary, items] = await Promise.all([
+      const [summary, items, latest] = await Promise.all([
         fetchJson(`${dataUrl}/history.json`),
         fetchJson(`${dataUrl}/history_items.json`),
+        // latest scheduled check, for its download test of the newest file per dataset
+        fetchJson(`${dataUrl}/status.json`).catch(() => []),
       ]);
-      setHistory({summary, items});
+      setHistory({summary, items, latest});
     } catch (e) {
       setHistory({error: true, summary: [], items: []});
     }
@@ -428,10 +414,18 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     return config.items.map((c) => {
       const m = live.m[c.key];
       const res = classify(c, live.checked, m || {});
-      const cls = m === undefined && res.cls !== 'static' ? 'unknown' : res.cls;
-      return {c, m: m || {}, value: res.value, stalled: res.stalled, cls};
+      let cls = m === undefined && res.cls !== 'static' ? 'unknown' : res.cls;
+      // The browser only reads the catalog; whether the newest file can actually be downloaded is
+      // tested by the scheduled check (every 30 min). A failed test from the last hour makes the
+      // dataset down, even if the catalog looks fresh.
+      const latest = ((history && history.latest) || []).find((x) => x.key === c.key);
+      const access = latest && latest.access;
+      const recent = latest && live.checked - new Date(latest.checked) < 60 * 60e3;
+      const noAccess = access && !access.ok && recent && ['ok', 'warn'].includes(cls) ? {...access, checked: new Date(latest.checked)} : null;
+      if (noAccess) cls = 'bad';
+      return {c, m: m || {}, value: res.value, stalled: res.stalled, cls, noAccess};
     });
-  }, [live]);
+  }, [live, history]);
 
   // deep link: once the data are there, scroll to the opened group or dataset
   const scrolled = useRef(false);
@@ -462,6 +456,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
 
   // short text of what was measured: latency or age of the newest data
   const describe = (r) => {
+    if (r.noAccess) return t.notDownloadable(r.noAccess.host, r.noAccess.error || `HTTP ${r.noAccess.http_status}`);
     if (r.c.metric === 'latency') return r.stalled ? `${t.noNewData}, ${t.latShort(fmtAge(r.value, t))}` : t.latShort(fmtAge(r.value, t));
     return t.valAge(fmtAge(r.value, t));
   };
@@ -470,8 +465,11 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   const out = late.filter((r) => r.cls === 'bad');
   const delayed = late.filter((r) => r.cls === 'warn');
   const unknown = late.filter((r) => r.cls === 'unknown');
+  const unreachable = out.filter((r) => r.noAccess);
+  const stale = out.filter((r) => !r.noAccess);
   const title = !late.length ? t.allOk : [
-    out.length && t.noNew + out.map((r) => `${name(r.c)} (${describe(r)})`).join(', '),
+    stale.length && t.noNew + stale.map((r) => `${name(r.c)} (${describe(r)})`).join(', '),
+    unreachable.length && t.notDownloadableList + unreachable.map((r) => `${name(r.c)} (${r.noAccess.host})`).join(', '),
     delayed.length && t.delayedList + delayed.map((r) => name(r.c)).join(', '),
     unknown.length && t.unknownList + unknown.map((r) => name(r.c)).join(', '),
   ].filter(Boolean).join(' · ');
@@ -518,6 +516,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
             + (r.m.stations ? ` · ${t.stations(r.m.stations.ok, r.m.stations.total)}${r.m.stations.stale.length ? ` · ${t.staleList}${r.m.stations.stale.join(', ')}` : ''}` : '')
           : t.metaAge(t.interval[r.c.interval], fmtTime(r.m.updated, t))
             + (r.m.modelRun ? ` · ${t.modelRun(fmtTime(r.m.modelRun, t))}` : ''))
+          + (r.noAccess ? ` · ${t.notDownloadable(r.noAccess.host, r.noAccess.error || `HTTP ${r.noAccess.http_status}`)} (${t.check} ${fmtClock(r.noAccess.checked, t)})` : '')
           + (r.c.season ? ` · ${t.pauseInfo}` : ''))}</p>
       </div>
   );
@@ -569,6 +568,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
             <span key={k}><i className={`${styles.swatch} ${styles[k]}`} />{t.legend[k]}</span>
           ))}
         </div>
+        <p className={`${styles.small} ${styles.greenMeans}`}>{t.greenMeans}</p>
         {history && history.error && <p className={styles.notice}>{t.historyMissing}</p>}
         <div className={styles.bars}>
           {GROUPS.map((g) => {
