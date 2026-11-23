@@ -31,7 +31,9 @@ Per item one of two metrics (`metric` in `config.json`):
   - `"aggregate": "median"`: latency of the station with the median latency among all current stations (pollen).
   - If no new data arrive (reference time older than interval plus warning threshold), the item counts as down.
 
-Collections with one item per day (`YYYYMMDD-ch`) are read by item date, not by last update: an empty item for the next day appears early in the morning, and items from about a week ago are touched again.
+**Download test.** On every scheduled check, the newest file of each dataset is requested (first kilobyte, one retry), on data.geo.admin.ch as well as on the CSCS object storage (`rgw.cscs.ch`) for the model data. If that fails, the dataset counts as down, even if the catalog looks fresh. The page applies the result of the latest check (if not older than one hour); the browser itself only reads the catalog.
+
+Items without files (placeholders created ahead of time, e.g. for the next month) are skipped. Collections with one item per day (`YYYYMMDD-ch`) are read by item date, not by last update: an empty item for the next day appears early in the morning, and items from about a week ago are touched again.
 
 `ok_max_min` is the target, `warn_max_min` the limit between delayed and down (usually 3 × target). Further options per item:
 
@@ -61,7 +63,7 @@ Items in their winter break are still measured and shown in grey, but do not cou
 | `status` | Overall status of all rated datasets: `ok`, `warn` (at least one delayed) or `bad` (at least one down) |
 | `summary` | Datasets up to date (`monitored`, `realtime`) and the share of checks in the last 30 days in which all were up to date |
 | `groups[]` | Status per group A–E with `total` and `ok` |
-| `items[]` | One entry per dataset: `key`, `name` (de/fr/it/en), `group`, `collection`, `documentation`, `metric`, `interval`, `status` (`ok`, `warn`, `bad`, `pause`, `static`), `value_min` (age or latency in minutes), `target_min`, `limit_min`, `reference_time` (latency: time the newest data refer to), `published` (when the newest data became available on the STAC API), `model_run` (forecast models: reference time of the run), share of checks with status ok in the last 24 hours and 30 days (`ok_share_24h_pct`, `ok_share_30d_pct`), for pollen also `stations` |
+| `items[]` | One entry per dataset: `key`, `name` (de/fr/it/en), `group`, `collection`, `documentation`, `metric`, `interval`, `status` (`ok`, `warn`, `bad`, `pause`, `static`), `value_min` (age or latency in minutes), `target_min`, `limit_min`, `reference_time` (latency: time the newest data refer to), `published` (when the newest data became available on the STAC API), `model_run` (forecast models: reference time of the run), `access` (download test: `ok`, `host`, `http_status`), share of checks with status ok in the last 24 hours and 30 days (`ok_share_24h_pct`, `ok_share_30d_pct`), for pollen also `stations` |
 | `links` | Page, history files and STAC API |
 
 Example: `curl -s https://meteoswiss.github.io/opendata-status/api/v1/status.json | jq '.items[] | select(.status != "ok") | .key'`
