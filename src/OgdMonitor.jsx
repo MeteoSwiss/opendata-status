@@ -279,7 +279,7 @@ async function fetchJson(url) {
 
 // ---------- history strip ----------
 
-function Strip({checks, end, firstEver, t}) {
+function Strip({checks, end, firstEver, t, incidents = []}) {
   const [sel, setSel] = useState(-1);
   const ref = useRef(null);
   const bins = useMemo(() => {
@@ -293,10 +293,14 @@ function Strip({checks, end, firstEver, t}) {
       let cls = '';
       if (inBin.length) cls = inBin.reduce((w, c) => (RANK[c.cls] > RANK[w] ? c.cls : w), inBin[0].cls);
       else if (firstEver && to < firstEver) cls = 'pre';
-      out.push({from, to, cls, checks: inBin});
+      // incident behind a failed hour, for the click through to the incident list
+      const inc = cls === 'bad' || cls === 'warn'
+        ? incidents.find((x) => new Date(x.start) < to && (x.end ? new Date(x.end) : end) >= from)
+        : null;
+      out.push({from, to, cls, checks: inBin, inc});
     }
     return out;
-  }, [checks, end, firstEver]);
+  }, [checks, end, firstEver, incidents]);
 
   const nBad = bins.filter((b) => b.cls === 'bad').length;
   const nWarn = bins.filter((b) => b.cls === 'warn').length;
@@ -308,6 +312,7 @@ function Strip({checks, end, firstEver, t}) {
     if (ev.key === 'ArrowLeft') { ev.preventDefault(); setSel((s) => Math.max(0, (s < 0 ? HOURS : s) - 1)); }
     else if (ev.key === 'ArrowRight') { ev.preventDefault(); setSel((s) => Math.min(HOURS - 1, s < 0 ? HOURS - 1 : s + 1)); }
     else if (ev.key === 'Escape') setSel(-1);
+    else if (ev.key === 'Enter' && sel >= 0 && bins[sel].inc) window.location.hash = `incident-${bins[sel].inc.id}`;
   };
   const b = sel >= 0 ? bins[sel] : null;
   const left = sel >= 0 ? `clamp(0px, calc(${((sel + 0.5) / HOURS) * 100}% - 140px), calc(100% - 280px))` : 0;
@@ -322,6 +327,7 @@ function Strip({checks, end, firstEver, t}) {
         aria-label={t.stripLabel(nBad, nWarn)}
         onPointerMove={(ev) => setSel(index(ev))}
         onPointerDown={(ev) => setSel(index(ev))}
+        onClick={(ev) => { const x = bins[index(ev)]; if (x && x.inc) window.location.hash = `incident-${x.inc.id}`; }}
         onPointerLeave={(ev) => { if (ev.pointerType === 'mouse') setSel(-1); }}
         onFocus={() => setSel((s) => (s < 0 ? HOURS - 1 : s))}
         onBlur={() => setSel(-1)}
@@ -336,9 +342,68 @@ function Strip({checks, end, firstEver, t}) {
           {b.checks.length
             ? b.checks.map((c, k) => <p key={k}>{c.text}</p>)
             : <p>{b.cls === 'pre' ? t.pre : t.noCheck}</p>}
+          {b.inc && <p className={styles.toIncident}>{t.toIncident}</p>}
         </div>
       )}
       <div className={styles.labels}><span>{t.hoursAgo}</span><span>{t.now}</span></div>
+    </div>
+  );
+}
+
+// ---------- incidents ----------
+
+// Incidents of the last 30 days, built by the scheduled check from the history (incidents.json)
+function Incidents({incidents, byKey, name, t}) {
+  const [all, setAll] = useState(false);
+  const [target, setTarget] = useState(() => (typeof window === 'undefined' ? '' : window.location.hash.slice(1)));
+  useEffect(() => {
+    const onHash = () => setTarget(window.location.hash.slice(1));
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+  const SHOW = 5;
+  const idx = (incidents || []).findIndex((x) => `incident-${x.id}` === target);
+  useEffect(() => {
+    if (idx < 0) return;
+    const el = document.getElementById(target);
+    if (el) requestAnimationFrame(() => el.scrollIntoView({block: 'center'}));
+  }, [target, idx]);
+  if (!incidents) return null;
+  const list = all || idx >= SHOW ? incidents : incidents.slice(0, SHOW);
+  return (
+    <div className={styles.section} id="incidents">
+      <p className={styles.h2}>{t.incidentsTitle}</p>
+      <p className={`${styles.small} ${styles.sub2}`}>{t.incidentsSub}</p>
+      {!incidents.length && <p className={styles.small}>{t.noIncidents}</p>}
+      <ol className={styles.incidents}>
+        {list.map((x) => {
+          const reasons = [...new Set(x.datasets.flatMap((d) => d.reasons))];
+          const details = [...new Set(x.datasets.flatMap((d) => d.details))];
+          return (
+            <li key={x.id} id={`incident-${x.id}`}
+              className={[styles.incident, `incident-${x.id}` === target && styles.target].filter(Boolean).join(' ')}>
+              <div className={styles.row}>
+                <span className={styles.incWhen}>
+                  {fmtTime(new Date(x.start), t)} – {x.ongoing ? t.ongoing : fmtTime(new Date(x.end), t)}
+                </span>
+                <span className={`${styles.status} ${styles[x.severity]}`}>{t.status[x.severity]}</span>
+              </div>
+              <p className={styles.incWhat}>
+                {x.datasets.map((d) => (byKey[d.key] ? name(byKey[d.key].c) : d.key)).join(', ')}
+              </p>
+              <p className={styles.statLine}>{segments([
+                `${t.duration} ${fmtAge(x.duration_min, t)}${x.ongoing ? ` (${t.ongoing})` : ''}`,
+                `${t.layerLabel}${t.layers[x.layer]}${x.hosts ? ` (${x.hosts.join(', ')})` : ''}`,
+                reasons.length ? reasons.map((r) => t.reasons[r] || r).join(', ') : t.reasons.unknown,
+                ...details.slice(0, 2),
+              ].join(' · '))}</p>
+            </li>
+          );
+        })}
+      </ol>
+      {!all && incidents.length > list.length && (
+        <button type="button" className={styles.more} onClick={() => setAll(true)}>{t.showAll(incidents.length)}</button>
+      )}
     </div>
   );
 }
@@ -390,13 +455,14 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
 
   const loadHistory = useCallback(async () => {
     try {
-      const [summary, items, latest] = await Promise.all([
+      const [summary, items, latest, incidentsDoc] = await Promise.all([
         fetchJson(`${dataUrl}/history.json`),
         fetchJson(`${dataUrl}/history_items.json`),
         // latest scheduled check, for its download test of the newest file per dataset
         fetchJson(`${dataUrl}/status.json`).catch(() => []),
+        fetchJson(`${dataUrl}/incidents.json`).catch(() => null),
       ]);
-      setHistory({summary, items, latest});
+      setHistory({summary, items, latest, incidents: incidentsDoc ? incidentsDoc.incidents : null});
     } catch (e) {
       setHistory({error: true, summary: [], items: []});
     }
@@ -448,6 +514,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   const dotCls = rtCls === 'ok' && problems ? 'warn' : rtCls;
 
   const hist = history || {summary: [], items: []};
+  const incidents = (history && history.incidents) || [];
+  const byKey = Object.fromEntries(rows.map((r) => [r.c.key, r]));
   const sumRt = hist.summary.reduce((s, h) => s + h.realtime_ok, 0);
   const totRt = hist.summary.reduce((s, h) => s + h.realtime_total, 0);
   const avg30 = totRt ? sumRt / totRt : null;
@@ -481,7 +549,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     const pts = hist.items.filter((p) => p.key === r.c.key).map((p) => {
       const cls = p.status;
       const v = r.c.metric === 'latency' ? t.latShort(fmtAge(p.value_min, t)) : t.newest(fmtAge(p.value_min, t));
-      return {t: new Date(p.checked), cls, text: `${t.status[cls] || cls} · ${v}`};
+      const why = p.reason ? ` · ${t.reasons[p.reason] || p.reason}${p.detail ? ` (${p.detail})` : ''}` : '';
+      return {t: new Date(p.checked), cls, text: `${t.status[cls] || cls} · ${v}${why}`};
     });
     if (r.cls !== 'unknown') pts.push({t: live.checked, cls: r.cls, text: `${t.status[r.cls]} · ${describe(r)} (${t.live})`});
     return pts;
@@ -508,7 +577,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         </div>
         {r.c.monitoring_pending
           ? <p className={styles.pending}>{t.pending}</p>
-          : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t} />}
+          : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t}
+              incidents={incidents.filter((x) => x.datasets.some((d) => d.key === r.c.key))} />}
         <p className={styles.statLine}>{segments(r.c.collection.replace('ch.meteoschweiz.', '') + ' · ' + (r.c.metric === 'latency'
           ? t.metaLat(fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
             + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
@@ -600,7 +670,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
                   </button>
                   <span className={`${styles.status} ${styles[cls]}`}>{cls === 'ok' ? t.allCurrent : t.ofCurrent(ok, rated.length)}</span>
                 </div>
-                <Strip checks={groupChecks(list)} end={live.checked} firstEver={firstEver} t={t} />
+                <Strip checks={groupChecks(list)} end={live.checked} firstEver={firstEver} t={t}
+                  incidents={incidents.filter((x) => x.datasets.some((d) => list.some((r) => r.c.key === d.key)))} />
                 {t.groupNote && t.groupNote[g] && (
                   <p className={styles.groupNote}>
                     {t.groupNote[g].pre}<a href={t.groupNote[g].url}>{t.groupNote[g].link}</a>{t.groupNote[g].post}
@@ -614,6 +685,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
           })}
         </div>
       </div>
+
+      <Incidents incidents={history && history.incidents} byKey={byKey} name={name} t={t} />
 
       <div className={styles.section}>
         <p className={styles.h2}>{t.keyFigures}</p>
