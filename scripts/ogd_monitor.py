@@ -17,6 +17,7 @@ Two kinds of checks, set per item in the configuration:
 Reads the existing history files from <data-dir> (if present) and writes:
     status.json         latest check, one row per item
     api-status.json     public JSON endpoint (published as api/v1/status.json), see README
+    incidents.json      incidents of the last 30 days (published as api/v1/incidents.json)
     history.json        one row per check: how many real-time / monitored items were up to date
     history_items.json  one row per check and monitored item: status and measured minutes
 History is kept for RETENTION_DAYS. Only the Python standard library is used.
@@ -185,6 +186,107 @@ def check_access(url, tries=2):
         if attempt + 1 < tries:
             time.sleep(5)
     return result
+
+
+REASONS = ("no_new_data", "late", "run_incomplete", "download_failed", "no_data", "check_failed")
+
+
+def failure_reason(c, now, status, updated, ref, run, access, error):
+    """(reason code, short detail) for a check that is not ok, else (None, None)."""
+    if status not in ("warn", "bad"):
+        return None, None
+    if access and not access.get("ok"):
+        return "download_failed", f"{access.get('error') or 'HTTP ' + str(access.get('http_status'))}, {access.get('host')}"
+    if error:
+        return "check_failed", error
+    if c["metric"] == "age":
+        return ("no_new_data", None) if updated else ("no_data", None)
+    if not ref:
+        return "no_data", None
+    if minutes(now, ref) > c["interval_min"] + c["warn_max_min"]:
+        return "no_new_data", None
+    if run and not run["complete"]:
+        return "run_incomplete", f"{run['files']}/{run['expected']}"
+    return "late", None
+
+
+def build_incidents(cfg, history_items, now, join_min=60):
+    """Incidents of the history window, newest first.
+
+    An episode is a run of consecutive checks of one dataset that are not ok; it ends with the next
+    ok check. Episodes that start within `join_min` minutes of each other, or a failure that starts
+    while another failure of the incident still runs, form one incident. Single
+    delayed checks are left out as noise. The likely layer follows from what failed and how much:
+    only downloads from one storage host, nearly all datasets (STAC API), several datasets (data
+    delivery) or a single dataset."""
+    rated = {c["key"] for c in cfg["items"] if c.get("ok_max_min") is not None}
+    by_key = {}
+    for r in sorted(history_items, key=lambda r: r["checked"]):
+        if r["key"] in rated:
+            by_key.setdefault(r["key"], []).append(r)
+    episodes = []
+    for key, rs in by_key.items():
+        cur = None
+        for r in rs:
+            if r["status"] in ("warn", "bad"):
+                if cur is None:
+                    cur = {"key": key, "start": r["checked"], "end": None, "severity": "warn", "checks": 0,
+                           "reasons": [], "details": []}
+                cur["checks"] += 1
+                cur["last_seen"] = r["checked"]
+                if r["status"] == "bad":
+                    cur["severity"] = "bad"
+                if r.get("reason") and r["reason"] not in cur["reasons"]:
+                    cur["reasons"].append(r["reason"])
+                if r.get("detail") and r["detail"] not in cur["details"]:
+                    cur["details"].append(r["detail"])
+            elif cur is not None:
+                cur["end"] = r["checked"]
+                episodes.append(cur)
+                cur = None
+        if cur is not None:
+            episodes.append(cur)
+    episodes = [e for e in episodes if e["severity"] == "bad" or e["checks"] >= 2]
+
+    incidents = []
+    for e in sorted(episodes, key=lambda e: e["start"]):
+        inc = incidents[-1] if incidents else None
+        # same incident: starts close to it, or a failure that starts while one of its failures still runs
+        running = inc and e["severity"] == "bad" and any(
+            x["severity"] == "bad" and x["start"] <= e["start"] and (x["end"] is None or e["start"] < x["end"])
+            for x in inc["datasets"])
+        if inc and (running or minutes(parse_iso(e["start"]), parse_iso(inc["start"])) <= join_min):
+            inc["datasets"].append(e)
+        else:
+            incidents.append({"start": e["start"], "datasets": [e]})
+
+    out = []
+    for inc in incidents:
+        ds = inc["datasets"]
+        ongoing = any(e["end"] is None for e in ds)
+        end = None if ongoing else max(e["end"] for e in ds)
+        reasons = [r for e in ds for r in e["reasons"]]
+        hosts = sorted({d.split(", ")[-1] for e in ds for d in e["details"] if ", " in d})
+        if reasons and all(r == "download_failed" for r in reasons) and len(hosts) == 1:
+            layer = "storage"
+        elif len(ds) >= 0.8 * len(rated):
+            layer = "catalog"
+        elif len(ds) >= 2:
+            layer = "delivery"
+        else:
+            layer = "dataset"
+        out.append({
+            "id": inc["start"].replace(":", "").replace("-", "") + "-" + ds[0]["key"],
+            "start": inc["start"],
+            "end": end,
+            "ongoing": ongoing,
+            "duration_min": round(minutes(parse_iso(end) if end else now, parse_iso(inc["start"])), 1),
+            "severity": "bad" if any(e["severity"] == "bad" for e in ds) else "warn",
+            "layer": layer,
+            **({"hosts": hosts} if layer == "storage" else {}),
+            "datasets": [{k: e[k] for k in ("key", "start", "end", "severity", "checks", "reasons", "details")} for e in ds],
+        })
+    return {"generated": iso(now), "check_interval_min": 30, "incidents": sorted(out, key=lambda i: i["start"], reverse=True)}
 
 
 def parse_ref(s):
@@ -481,7 +583,7 @@ def main():
     rows, items, failures = [], [], 0
     counts = {"realtime_total": 0, "realtime_ok": 0, "monitored_total": 0, "monitored_ok": 0}
     for c in cfg["items"]:
-        updated = ref = available = run = coverage = model_run = None
+        updated = ref = available = run = coverage = model_run = error = None
         try:
             if c["metric"] == "age":
                 if c.get("source", {}).get("kind") == "newest_asset":
@@ -498,6 +600,7 @@ def main():
         except Exception as e:  # network or format error for this item
             print(f"warning: {c['key']}: {e}", file=sys.stderr)
             failures += 1
+            error = type(e).__name__
         status, value = classify(c, now, updated, ref, available)
         # can users actually download the newest file? (catalog entries alone say nothing about storage)
         access = None
@@ -514,16 +617,19 @@ def main():
                 print(f"  {c['key']}: newest file not downloadable ({access.get('error')}, {access['host']})")
                 if status != "pause":
                     status = "bad"
+        reason, detail = failure_reason(c, now, status, updated, ref, run, access, error)
         rows.append({"key": c["key"], "collection": c["collection"], "group": c["group"], "metric": c["metric"],
                      "updated": iso(updated), "ref_time": iso(ref), "available": iso(available),
                      "value_min": value, "status": status, "checked": checked,
                      **({"run_files": run["files"], "run_files_expected": run["expected"], "run_complete": run["complete"]} if run else {}),
                      **({"stations_total": coverage["total"], "stations_ok": coverage["ok"], "stations_stale": coverage["stale"]} if coverage else {}),
                      **({"model_run": model_run} if model_run else {}),
-                     **({"access": access} if access else {})})
+                     **({"access": access} if access else {}),
+                     **({"reason": reason, "detail": detail} if reason else {})})
         if status == "static":
             continue
-        items.append({"checked": checked, "key": c["key"], "status": status, "value_min": value})
+        items.append({"checked": checked, "key": c["key"], "status": status, "value_min": value,
+                      **({"reason": reason} if reason else {}), **({"detail": detail} if detail else {})})
         if status == "pause":
             continue
         counts["monitored_total"] += 1
@@ -549,6 +655,7 @@ def main():
 
     dump("status.json", rows)
     dump("api-status.json", api_status(cfg, rows, history, history_items, now, checked))
+    dump("incidents.json", build_incidents(cfg, history_items, now))
     dump("history.json", history)
     dump("history_items.json", history_items, compact=True)
     print(f"{checked}: real-time up to date {counts['realtime_ok']}/{counts['realtime_total']}, "

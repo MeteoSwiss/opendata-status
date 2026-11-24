@@ -298,6 +298,16 @@
 
 .groupNote { margin: 8px 0 0 !important; font-size: 13px; line-height: 1.45; color: var(--m-muted); }
 
+.incidents { list-style: none; margin: 8px 0 0; padding: 0; }
+.incident { padding: 12px 10px 12px 12px; margin: 0 -10px 0 -12px; border-radius: 4px; }
+.incident + .incident { border-top: 1px solid var(--m-line); }
+.incident.target { background: #fdf6ec; }
+.incWhen { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.incWhat { margin: 2px 0 0 !important; font-size: 14px; }
+.toIncident { color: var(--m-muted); font-style: italic; }
+.more { margin-top: 10px; padding: 6px 12px; border: 1px solid var(--m-line); border-radius: 4px; background: none; font: inherit; font-size: 14px; color: inherit; cursor: pointer; }
+.more:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 0; }
+
 /* ---------- compact dataset entries inside an opened group ---------- */
 .groupList { margin-top: 14px; padding: 0 0 0 16px; }
 .groupList .service { padding: 10px 0 10px 12px; margin: 0 0 0 -12px; border-radius: 4px 0 0 4px; }
