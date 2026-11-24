@@ -25,6 +25,10 @@ if (fs.existsSync('data/api-status.json')) {
   fs.mkdirSync('dist/api/v1', {recursive: true});
   fs.copyFileSync('data/api-status.json', 'dist/api/v1/status.json');
 }
+if (fs.existsSync('data/incidents.json')) {
+  fs.mkdirSync('dist/api/v1', {recursive: true});
+  fs.copyFileSync('data/incidents.json', 'dist/api/v1/incidents.json');
+}
 
 const options = {
   entryPoints: ['src/main.jsx'],

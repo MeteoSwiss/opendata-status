@@ -50,6 +50,7 @@ Items in their winter break are still measured and shown in grey, but do not cou
 
 - **Overview**: one strip per group A–E for the last 72 hours, one bar per hour. A bar is green when all datasets of the group were up to date, red when none was, otherwise orange.
 - **Opening a group** shows its datasets with key figure, status and their own strip. Deep links open the group: `#group-D` or `#monitor-<key>`, e.g. `#monitor-radar-rzc`.
+- **Incidents**: list of the last 30 days below the overview (five shown, more on request); clicking a failed hour in a strip jumps to its incident. Deep link: `#incident-<id>`.
 - **Notes**: the intro links to the operational status of geo.admin.ch, group A to the data availability of the ground-based stations.
 
 ## JSON endpoint
@@ -67,6 +68,8 @@ Items in their winter break are still measured and shown in grey, but do not cou
 | `links` | Page, history files and STAC API |
 
 Example: `curl -s https://meteoswiss.github.io/opendata-status/api/v1/status.json | jq '.items[] | select(.status != "ok") | .key'`
+
+**https://meteoswiss.github.io/opendata-status/api/v1/incidents.json** lists the incidents of the last 30 days, newest first: `start`, `end` (null while `ongoing`), `duration_min`, `severity`, the likely `layer` (`dataset`, `delivery`, `storage` with `hosts`, `catalog`) and per affected dataset its `start`, `end`, `checks` and what failed (`reasons`: `no_new_data`, `late`, `run_incomplete`, `download_failed`, `no_data`, `check_failed`; plus `details` such as the HTTP status and host). Failures that start within an hour of each other, or while another failure of the incident still runs, form one incident; a single delayed check is left out. Reasons are recorded since 24 Nov 2026; older incidents have none. The layer is derived from what failed, not a confirmed cause.
 
 The history is available as `data/history.json` (per check) and `data/history_items.json` (per check and dataset).
 
