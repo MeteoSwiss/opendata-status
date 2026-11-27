@@ -42,7 +42,8 @@ UTC = dt.timezone.utc
 
 
 def iso(t):
-    return t.strftime("%Y-%m-%dT%H:%M:%SZ") if t else None
+    """ISO 8601 in UTC; strings (already formatted) and None pass through unchanged."""
+    return t if t is None or isinstance(t, str) else t.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def parse_iso(s):
@@ -53,13 +54,17 @@ def minutes(a, b):
     return round((a - b).total_seconds() / 60, 1)
 
 
-def newest_items(api, collection, n=1):
-    body = json.dumps({"collections": [collection], "limit": n,
-                       "sortby": [{"field": "properties.updated", "direction": "desc"}]}).encode()
-    req = urllib.request.Request(api.rstrip("/") + "/search", data=body,
+def search(api, query):
+    """POST a STAC item search and return its features."""
+    req = urllib.request.Request(api.rstrip("/") + "/search", data=json.dumps(query).encode(),
                                  headers={**UA, "Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:
         return json.load(r).get("features", [])
+
+
+def newest_items(api, collection, n=1):
+    return search(api, {"collections": [collection], "limit": n,
+                        "sortby": [{"field": "properties.updated", "direction": "desc"}]})
 
 
 def dated_items(api, collection, n=1):
@@ -86,13 +91,8 @@ def newest_asset_time(api, collection):
     return max(times) if times else None
 
 
-def newest_item(api, collection):
-    features = newest_items(api, collection)
-    return features[0] if features else None
-
-
 def ref_time_from_name(name, src):
-    """Reference time (UTC) encoded in an asset file name, or None."""
+    """Reference time (UTC) encoded in an asset file name, or None. Same rules as refFromName in src/rules.mjs."""
     if not name.startswith(src["prefix"]):
         return None
     rest = name[len(src["prefix"]):]
@@ -132,19 +132,30 @@ def latency_from_assets(api, item_cfg, now):
             ref = ref_time_from_name(name, src)
             if ref:
                 runs.setdefault(ref, []).append(parse_iso(a.get("created") or a.get("updated")))
+    return select_run(runs, now, item_cfg["ok_max_min"])
+
+
+def select_run(runs, now, ok_max_min):
+    """(reference time, available time, run info) of the model run to rate.
+
+    runs: {reference time: [availability time of each file]}. A run is complete when it has as many
+    files as the largest run (all parameters). Same rules as selectRun in src/rules.mjs."""
     if not runs:
         return None, None, None
     expected = max(len(v) for v in runs.values())
     order = sorted(runs, reverse=True)
     newest = order[0]
+
+    def result(ref, complete):
+        info = {"files": len(runs[ref]), "expected": expected, "complete": complete}
+        return ref, (max(runs[ref]) if complete else now), info
+
     if len(runs[newest]) >= expected:
-        return newest, max(runs[newest]), {"files": len(runs[newest]), "expected": expected, "complete": True}
-    if minutes(now, newest) > item_cfg["ok_max_min"]:
-        return newest, now, {"files": len(runs[newest]), "expected": expected, "complete": False}
-    for ref in order[1:]:
-        if len(runs[ref]) >= expected:
-            return ref, max(runs[ref]), {"files": len(runs[ref]), "expected": expected, "complete": True}
-    return newest, now, {"files": len(runs[newest]), "expected": expected, "complete": False}
+        return result(newest, True)
+    if minutes(now, newest) > ok_max_min:
+        return result(newest, False)
+    prev = next((ref for ref in order[1:] if len(runs[ref]) >= expected), None)
+    return result(prev, True) if prev else result(newest, False)
 
 
 def newest_file(api, item_cfg):
@@ -187,9 +198,6 @@ def check_access(url, tries=2):
         if attempt + 1 < tries:
             time.sleep(5)
     return result
-
-
-REASONS = ("no_new_data", "late", "run_incomplete", "download_failed", "no_data", "check_failed")
 
 
 def failure_reason(c, now, status, updated, ref, run, access, error):
@@ -357,8 +365,9 @@ def build_incidents(cfg, history_items, now, join_min=60, api=None):
 
 
 def parse_ref(s):
+    """Reference time (UTC) of a CSV value. Same rules as parseRef in src/rules.mjs."""
     s = s.strip()
-    for fmt in ("%d.%m.%Y %H:%M", "%Y-%m-%d %H:%M", "%Y%m%d%H%M"):
+    for fmt in ("%d.%m.%Y %H:%M", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%Y%m%d%H%M"):
         try:
             return dt.datetime.strptime(s[:16], fmt).replace(tzinfo=UTC)
         except ValueError:
@@ -367,12 +376,8 @@ def parse_ref(s):
 
 
 def station_items(api, collection):
-    """All station items of a collection (one search request)."""
-    body = json.dumps({"collections": [collection], "limit": 100}).encode()
-    req = urllib.request.Request(api.rstrip("/") + "/search", data=body,
-                                 headers={**UA, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:
-        return json.load(r).get("features", [])
+    """All station items of a collection (one search request, at most 100 items)."""
+    return search(api, {"collections": [collection], "limit": 100})
 
 
 def get_item(api, collection, item_id):
@@ -490,7 +495,8 @@ def pause_end(item_cfg, now):
 
 
 def classify(item_cfg, now, updated=None, ref=None, available=None):
-    """Return (status, measured minutes). status: ok, warn, bad, pause, static."""
+    """Return (status, measured minutes). status: ok, warn, bad, pause, static.
+    Same rules as classify in src/rules.mjs; shared test cases in tests/cases.json."""
     okm, warnm = item_cfg["ok_max_min"], item_cfg["warn_max_min"]
     if okm is None:
         return "static", None
@@ -559,9 +565,6 @@ def api_status(cfg, rows, history, history_items, now, checked):
               and (now - parse_iso(r["checked"])).total_seconds() <= hours * 3600]
         return round(100 * sum(r["status"] == "ok" for r in rs) / len(rs), 1) if rs else None
 
-    def iso(v):
-        return v if v is None or isinstance(v, str) else v.strftime("%Y-%m-%dT%H:%M:%SZ")
-
     items = []
     for r in rows:
         c = by_key[r["key"]]
@@ -624,6 +627,73 @@ def api_status(cfg, rows, history, history_items, now, checked):
     }
 
 
+def measure_item(api, c, now):
+    """Measures one configured item on the STAC API (network). Returns the measured values:
+    updated (age), ref / available (latency), run (model runs), coverage (stations), model_run."""
+    m = {}
+    if c["metric"] == "age":
+        if c.get("source", {}).get("kind") == "newest_asset":
+            m["updated"] = newest_asset_time(api, c["collection"])
+        else:
+            f = newest_filled_item(api, c["collection"])
+            m["updated"] = parse_iso(f["properties"]["updated"]) if f else None
+            # forecast models: the run the newest files belong to
+            m["model_run"] = (f or {}).get("properties", {}).get("forecast:reference_datetime")
+    elif c["source"]["kind"] == "asset_name":
+        m["ref"], m["available"], m["run"] = latency_from_assets(api, c, now)
+    elif c["source"]["kind"] == "station_now_csv":
+        m["ref"], m["available"], m["coverage"] = latency_from_station_csv(api, c, now)
+    return m
+
+
+def newest_access(api, c, ref):
+    """Download test of the newest file of an item (network), or None if there is nothing to test."""
+    url = newest_file(api, c)
+    if url:
+        return check_access(url)
+    if c.get("source", {}).get("kind") == "station_now_csv" and ref:
+        # the measurement has already downloaded the station file
+        return {"ok": True, "host": urllib.parse.urlsplit(FILES).hostname, "http_status": 200}
+    return None
+
+
+def check_item(api, c, now):
+    """One check of one configured item: measure, rate, test the download and give the reason of a
+    failure. Returns (row of status.json, name of the measurement error or None)."""
+    m, error = {}, None
+    try:
+        m = measure_item(api, c, now)
+    except Exception as e:  # network or format error for this item
+        print(f"warning: {c['key']}: {e}", file=sys.stderr)
+        error = type(e).__name__
+    updated, ref, available = m.get("updated"), m.get("ref"), m.get("available")
+    run, coverage, model_run = m.get("run"), m.get("coverage"), m.get("model_run")
+    status, value = classify(c, now, updated, ref, available)
+
+    # can users actually download the newest file? (catalog entries alone say nothing about storage)
+    access = None
+    if status in ("ok", "warn", "pause"):
+        try:
+            access = newest_access(api, c, ref)
+        except Exception as e:
+            print(f"warning: {c['key']}: access check: {e}", file=sys.stderr)
+        if access and not access["ok"]:
+            print(f"  {c['key']}: newest file not downloadable ({access.get('error')}, {access['host']})")
+            if status != "pause":
+                status = "bad"
+
+    reason, detail = failure_reason(c, now, status, updated, ref, run, access, error)
+    row = {"key": c["key"], "collection": c["collection"], "group": c["group"], "metric": c["metric"],
+           "updated": iso(updated), "ref_time": iso(ref), "available": iso(available),
+           "value_min": value, "status": status, "checked": iso(now),
+           **({"run_files": run["files"], "run_files_expected": run["expected"], "run_complete": run["complete"]} if run else {}),
+           **({"stations_total": coverage["total"], "stations_ok": coverage["ok"], "stations_stale": coverage["stale"]} if coverage else {}),
+           **({"model_run": model_run} if model_run else {}),
+           **({"access": access} if access else {}),
+           **({"reason": reason, "detail": detail} if reason else {})}
+    return row, error
+
+
 def load(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -650,58 +720,20 @@ def main():
     rows, items, failures = [], [], 0
     counts = {"realtime_total": 0, "realtime_ok": 0, "monitored_total": 0, "monitored_ok": 0}
     for c in cfg["items"]:
-        updated = ref = available = run = coverage = model_run = error = None
-        try:
-            if c["metric"] == "age":
-                if c.get("source", {}).get("kind") == "newest_asset":
-                    updated = newest_asset_time(api, c["collection"])
-                else:
-                    f = newest_filled_item(api, c["collection"])
-                    updated = parse_iso(f["properties"]["updated"]) if f else None
-                    # forecast models: the run the newest files belong to
-                    model_run = (f or {}).get("properties", {}).get("forecast:reference_datetime")
-            elif c["source"]["kind"] == "asset_name":
-                ref, available, run = latency_from_assets(api, c, now)
-            elif c["source"]["kind"] == "station_now_csv":
-                ref, available, coverage = latency_from_station_csv(api, c, now)
-        except Exception as e:  # network or format error for this item
-            print(f"warning: {c['key']}: {e}", file=sys.stderr)
-            failures += 1
-            error = type(e).__name__
-        status, value = classify(c, now, updated, ref, available)
-        # can users actually download the newest file? (catalog entries alone say nothing about storage)
-        access = None
-        if status in ("ok", "warn", "pause"):
-            try:
-                url = newest_file(api, c)
-                if url:
-                    access = check_access(url)
-                elif c.get("source", {}).get("kind") == "station_now_csv" and ref:
-                    access = {"ok": True, "host": urllib.parse.urlsplit(FILES).hostname, "http_status": 200}
-            except Exception as e:
-                print(f"warning: {c['key']}: access check: {e}", file=sys.stderr)
-            if access and not access["ok"]:
-                print(f"  {c['key']}: newest file not downloadable ({access.get('error')}, {access['host']})")
-                if status != "pause":
-                    status = "bad"
-        reason, detail = failure_reason(c, now, status, updated, ref, run, access, error)
-        rows.append({"key": c["key"], "collection": c["collection"], "group": c["group"], "metric": c["metric"],
-                     "updated": iso(updated), "ref_time": iso(ref), "available": iso(available),
-                     "value_min": value, "status": status, "checked": checked,
-                     **({"run_files": run["files"], "run_files_expected": run["expected"], "run_complete": run["complete"]} if run else {}),
-                     **({"stations_total": coverage["total"], "stations_ok": coverage["ok"], "stations_stale": coverage["stale"]} if coverage else {}),
-                     **({"model_run": model_run} if model_run else {}),
-                     **({"access": access} if access else {}),
-                     **({"reason": reason, "detail": detail} if reason else {})})
+        row, error = check_item(api, c, now)
+        rows.append(row)
+        failures += bool(error)
+        status = row["status"]
         if status == "static":
             continue
-        items.append({"checked": checked, "key": c["key"], "status": status, "value_min": value,
-                      **({"reason": reason} if reason else {}), **({"detail": detail} if detail else {})})
+        items.append({"checked": checked, "key": c["key"], "status": status, "value_min": row["value_min"],
+                      **({"reason": row["reason"]} if row.get("reason") else {}),
+                      **({"detail": row["detail"]} if row.get("detail") else {})})
         if status == "pause":
             continue
         counts["monitored_total"] += 1
         counts["monitored_ok"] += status == "ok"
-        if c["realtime"]:
+        if c.get("realtime"):
             counts["realtime_total"] += 1
             counts["realtime_ok"] += status == "ok"
 

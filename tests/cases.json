@@ -1,0 +1,68 @@
+{
+ "description": "Shared test cases of the rating rules in scripts/ogd_monitor.py and src/rules.mjs, checked by tests/test_cases.py and tests/cases.test.mjs. Times in UTC. 'item' is either the key of an entry in config.json or an inline configuration. 'value' in minutes, compared to 0.1 min. expect null = no result; expect \"error\" = the function refuses the input.",
+ "classify": [
+  {"name": "age up to date", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T11:45:00Z", "expect": {"status": "ok", "value": 15}},
+  {"name": "age at target", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T11:40:00Z", "expect": {"status": "ok", "value": 20}},
+  {"name": "age delayed", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T11:30:00Z", "expect": {"status": "warn", "value": 30}},
+  {"name": "age at limit", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T11:00:00Z", "expect": {"status": "warn", "value": 60}},
+  {"name": "age down", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T10:00:00Z", "expect": {"status": "bad", "value": 120}},
+  {"name": "age without data", "item": "smn", "now": "2026-11-24T12:00:00Z", "expect": {"status": "bad", "value": null}},
+  {"name": "age in the future counts as 0", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T12:03:00Z", "expect": {"status": "ok", "value": 0}},
+  {"name": "static", "item": "climate-normals-grid", "now": "2026-11-24T12:00:00Z", "updated": "2020-01-01T00:00:00Z", "expect": {"status": "static", "value": null}},
+  {"name": "latency up to date", "item": "radar-rzc", "now": "2026-11-24T12:00:00Z", "ref": "2026-11-24T11:55:00Z", "available": "2026-11-24T11:59:00Z", "expect": {"status": "ok", "value": 4}},
+  {"name": "latency delayed", "item": "radar-rzc", "now": "2026-11-24T12:00:00Z", "ref": "2026-11-24T11:45:00Z", "available": "2026-11-24T11:55:00Z", "expect": {"status": "warn", "value": 10}},
+  {"name": "latency down", "item": "smn-klo", "now": "2026-11-24T12:00:00Z", "ref": "2026-11-24T11:10:00Z", "available": "2026-11-24T11:58:00Z", "expect": {"status": "bad", "value": 48}},
+  {"name": "latency without data", "item": "radar-rzc", "now": "2026-11-24T12:00:00Z", "expect": {"status": "bad", "value": null}},
+  {"name": "latency without availability", "item": "radar-rzc", "now": "2026-11-24T12:00:00Z", "ref": "2026-11-24T11:55:00Z", "expect": {"status": "bad", "value": null}},
+  {"name": "no new data: short latency, but reference time older than interval + limit", "item": "smn-klo", "now": "2026-11-24T12:00:00Z", "ref": "2026-11-24T11:00:00Z", "available": "2026-11-24T11:05:00Z", "expect": {"status": "bad", "value": 5}},
+  {"name": "reference time exactly at interval + limit is still rated", "item": "smn-klo", "now": "2026-11-24T12:00:00Z", "ref": "2026-11-24T11:05:00Z", "available": "2026-11-24T11:15:00Z", "expect": {"status": "ok", "value": 10}},
+  {"name": "winter break: measured, not rated", "item": "phenology", "now": "2026-12-15T00:00:00Z", "updated": "2026-12-14T00:00:00Z", "expect": {"status": "pause", "value": 1440}},
+  {"name": "winter break without data", "item": "phenology", "now": "2026-01-15T00:00:00Z", "expect": {"status": "pause", "value": null}},
+  {"name": "after the break the interval runs from 1 March", "item": "phenology", "now": "2026-03-05T00:00:00Z", "updated": "2025-11-20T00:00:00Z", "expect": {"status": "ok", "value": 151200}},
+  {"name": "after the break: delayed once the target has passed since 1 March", "item": "phenology", "now": "2026-03-20T00:00:00Z", "updated": "2025-11-20T00:00:00Z", "expect": {"status": "warn", "value": 172800}},
+  {"name": "after the break: an update after 1 March is rated as usual", "item": "phenology", "now": "2026-04-30T00:00:00Z", "updated": "2026-03-10T00:00:00Z", "expect": {"status": "bad", "value": 73440}}
+ ],
+ "pause_end": [
+  {"name": "in March", "item": "phenology", "now": "2026-03-15T10:00:00Z", "expect": "2026-03-01T00:00:00Z"},
+  {"name": "in November: end of the last break", "item": "phenology", "now": "2026-11-15T10:00:00Z", "expect": "2026-03-01T00:00:00Z"},
+  {"name": "during the break: end of the previous break", "item": "phenology", "now": "2026-01-15T10:00:00Z", "expect": "2025-03-01T00:00:00Z"},
+  {"name": "without break", "item": "smn", "now": "2026-03-15T10:00:00Z", "expect": null}
+ ],
+ "ref_time_from_name": [
+  {"name": "radar: year, day of year, time", "file": "rzc263141550vl.001.h5", "source": {"prefix": "rzc", "time": "yyjjjhhmm"}, "expect": "2026-11-10T15:50:00Z"},
+  {"name": "radar: 1 January", "file": "cpc260010005_00005.801.h5", "source": {"prefix": "cpc", "time": "yyjjjhhmm"}, "expect": "2026-01-01T00:05:00Z"},
+  {"name": "radar: 2400 is midnight at the end of the day", "file": "rzc263142400vl.001.h5", "source": {"prefix": "rzc", "time": "yyjjjhhmm"}, "expect": "2026-11-11T00:00:00Z"},
+  {"name": "radar: other product", "file": "cpc263141550.h5", "source": {"prefix": "rzc", "time": "yyjjjhhmm"}, "expect": null},
+  {"name": "radar: no time in the name", "file": "rzc_readme.txt", "source": {"prefix": "rzc", "time": "yyjjjhhmm"}, "expect": null},
+  {"name": "local forecast", "file": "vnut12.lssw.202611101500.tre200h0.csv", "source": {"prefix": "vnut12", "time": "yyyymmddhhmm"}, "expect": "2026-11-10T15:00:00Z"},
+  {"name": "local forecast without time", "file": "vnut12.lssw.meta.csv", "source": {"prefix": "vnut12", "time": "yyyymmddhhmm"}, "expect": null},
+  {"name": "unknown time format", "file": "rzc1", "source": {"prefix": "rzc", "time": "unix"}, "expect": "error"}
+ ],
+ "parse_ref": [
+  {"value": "24.11.2026 01:30", "expect": "2026-11-24T01:30:00Z"},
+  {"value": " 24.11.2026 01:30:00 ", "expect": "2026-11-24T01:30:00Z"},
+  {"value": "2026-11-24 01:30", "expect": "2026-11-24T01:30:00Z"},
+  {"value": "2026-11-24T01:30:00Z", "expect": "2026-11-24T01:30:00Z"},
+  {"value": "202611240130", "expect": "2026-11-24T01:30:00Z"},
+  {"value": "", "expect": null},
+  {"value": "n/a", "expect": null}
+ ],
+ "select_run": [
+  {"name": "newest run complete", "now": "2026-11-24T11:20:00Z", "ok_max_min": 15,
+   "runs": {"2026-11-24T10:00:00Z": ["2026-11-24T10:05:00Z", "2026-11-24T10:06:00Z"], "2026-11-24T11:00:00Z": ["2026-11-24T11:04:00Z", "2026-11-24T11:08:00Z"]},
+   "expect": {"ref": "2026-11-24T11:00:00Z", "available": "2026-11-24T11:08:00Z", "run": {"files": 2, "expected": 2, "complete": true}}},
+  {"name": "newest run incomplete within the target: previous complete run", "now": "2026-11-24T11:10:00Z", "ok_max_min": 15,
+   "runs": {"2026-11-24T10:00:00Z": ["2026-11-24T10:05:00Z", "2026-11-24T10:06:00Z"], "2026-11-24T11:00:00Z": ["2026-11-24T11:04:00Z"]},
+   "expect": {"ref": "2026-11-24T10:00:00Z", "available": "2026-11-24T10:06:00Z", "run": {"files": 2, "expected": 2, "complete": true}}},
+  {"name": "newest run incomplete beyond the target: latency so far", "now": "2026-11-24T11:40:00Z", "ok_max_min": 15,
+   "runs": {"2026-11-24T10:00:00Z": ["2026-11-24T10:05:00Z", "2026-11-24T10:06:00Z"], "2026-11-24T11:00:00Z": ["2026-11-24T11:04:00Z"]},
+   "expect": {"ref": "2026-11-24T11:00:00Z", "available": "2026-11-24T11:40:00Z", "run": {"files": 1, "expected": 2, "complete": false}}},
+  {"name": "newest runs incomplete: the complete run further back", "now": "2026-11-24T11:10:00Z", "ok_max_min": 15,
+   "runs": {"2026-11-24T10:00:00Z": ["2026-11-24T10:05:00Z"], "2026-11-24T11:00:00Z": ["2026-11-24T11:04:00Z"], "2026-11-24T09:00:00Z": ["2026-11-24T09:05:00Z", "2026-11-24T09:06:00Z", "2026-11-24T09:07:00Z"]},
+   "expect": {"ref": "2026-11-24T09:00:00Z", "available": "2026-11-24T09:07:00Z", "run": {"files": 3, "expected": 3, "complete": true}}},
+  {"name": "an incomplete run in between is skipped", "now": "2026-11-24T11:10:00Z", "ok_max_min": 15,
+   "runs": {"2026-11-24T11:00:00Z": ["2026-11-24T11:04:00Z"], "2026-11-24T10:00:00Z": ["2026-11-24T10:04:00Z", "2026-11-24T10:05:00Z"], "2026-11-24T10:30:00Z": ["2026-11-24T10:34:00Z"]},
+   "expect": {"ref": "2026-11-24T10:00:00Z", "available": "2026-11-24T10:05:00Z", "run": {"files": 2, "expected": 2, "complete": true}}},
+  {"name": "no runs", "now": "2026-11-24T11:10:00Z", "ok_max_min": 15, "runs": {}, "expect": null}
+ ]
+}

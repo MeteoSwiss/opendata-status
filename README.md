@@ -13,9 +13,10 @@ How up to date the MeteoSwiss open data are on the [STAC API](https://data.geo.a
 | Path | Purpose |
 |:--|:--|
 | `config.json` | Single configuration for page and check: monitored collections, group A–E, metric, intervals, thresholds, names in de/fr/it/en, documentation links |
-| `src/` | Page (React, bundled with esbuild): `main.jsx` frame and language choice, `OgdMonitor.jsx` status logic, `strings.js` texts |
+| `src/` | Page (React, bundled with esbuild): `main.jsx` frame and language choice, `OgdMonitor.jsx` page content, `Strip.jsx` history strip, `Incidents.jsx` incident list, `stac.js` live measurement, `rules.mjs` rating rules, `format.jsx` formatting, `strings.js` texts |
 | `scripts/ogd_monitor.py` | Check for the history (Python standard library only) |
 | `corrections.json` | Corrections of history entries that were measured wrongly; applied on every run, can be emptied once its entries are older than 30 days |
+| `tests/` | Tests without network, run by the workflow before every check (`npm test`). `cases.json` holds shared cases of the rating rules, which exist twice: in `scripts/ogd_monitor.py` and in `src/rules.mjs`. A rule change needs both files and a case in `cases.json`. |
 | `seed/` | Initial history (from 10 Nov 2026), used once when the branch `monitor-data` does not exist yet |
 | `.github/workflows/status.yml` | Check, history, build and deployment |
 
@@ -87,6 +88,7 @@ npm install
 npm start            # http://localhost:8000, live status + history from ./data or ./seed
 npm run build        # static page in dist/
 python3 scripts/ogd_monitor.py --config config.json --data data   # one check into ./data
+npm test             # tests: shared cases in Node and Python, plus tests of the check
 ``` -->
 
 ## Notes

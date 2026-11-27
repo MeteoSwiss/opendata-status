@@ -5,7 +5,8 @@
   "description": "Open Data Status MeteoSwiss: how up to date the OGD collections are on the FSDI STAC API",
   "scripts": {
     "build": "node build.mjs",
-    "start": "node build.mjs --serve"
+    "start": "node build.mjs --serve",
+    "test": "node --test tests/cases.test.mjs && python3 -m unittest discover -s tests"
   },
   "dependencies": {
     "react": "^18.3.1",
