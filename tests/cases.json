@@ -1,5 +1,5 @@
 {
- "description": "Shared test cases of the rating rules in scripts/ogd_monitor.py and src/rules.mjs, checked by tests/test_cases.py and tests/cases.test.mjs. Times in UTC. 'item' is either the key of an entry in config.json or an inline configuration. 'value' in minutes, compared to 0.1 min. expect null = no result; expect \"error\" = the function refuses the input.",
+ "description": "Shared test cases of the rating rules in scripts/ogd_monitor.py and src/rules.mjs, checked by tests/test_cases.py and tests/cases.test.mjs. Times in UTC. 'item' is either the key of an entry in config.json or an inline configuration. 'value' in minutes, compared to 0.1 min. expect null = no result; expect \"error\" = the function refuses the input. Section current_status is browser only (src/rules.mjs: which measurement counts and for how long; limits: live result 10 min, scheduled check 60 min).",
  "classify": [
   {"name": "age up to date", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T11:45:00Z", "expect": {"status": "ok", "value": 15}},
   {"name": "age at target", "item": "smn", "now": "2026-11-24T12:00:00Z", "updated": "2026-11-24T11:40:00Z", "expect": {"status": "ok", "value": 20}},
@@ -64,5 +64,19 @@
    "runs": {"2026-11-24T11:00:00Z": ["2026-11-24T11:04:00Z"], "2026-11-24T10:00:00Z": ["2026-11-24T10:04:00Z", "2026-11-24T10:05:00Z"], "2026-11-24T10:30:00Z": ["2026-11-24T10:34:00Z"]},
    "expect": {"ref": "2026-11-24T10:00:00Z", "available": "2026-11-24T10:05:00Z", "run": {"files": 2, "expected": 2, "complete": true}}},
   {"name": "no runs", "now": "2026-11-24T11:10:00Z", "ok_max_min": 15, "runs": {}, "expect": null}
+ ],
+ "current_status": [
+  {"name": "current live result", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": {"m": {"updated": "2026-11-24T11:50:00Z"}, "measured_at": "2026-11-24T11:55:00Z"}, "check": null, "expect": {"cls": "ok", "source": "live", "value": 10}},
+  {"name": "the live result is rated at the current time: its age grows", "item": "smn", "now": "2026-11-24T12:04:00Z", "live": {"m": {"updated": "2026-11-24T11:40:00Z"}, "measured_at": "2026-11-24T11:55:00Z"}, "check": null, "expect": {"cls": "warn", "source": "live", "value": 24}},
+  {"name": "old green live result expires instead of staying green", "item": "smn", "now": "2026-11-24T12:20:00Z", "live": {"m": {"updated": "2026-11-24T11:54:00Z"}, "measured_at": "2026-11-24T11:55:00Z"}, "check": null, "expect": {"cls": "stale", "source": null, "value": null}},
+  {"name": "live expired: the scheduled check takes over, rated at the current time", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": {"m": {"updated": "2026-11-24T11:20:00Z"}, "measured_at": "2026-11-24T11:25:00Z"}, "check": {"key": "smn", "checked": "2026-11-24T11:40:00Z", "status": "ok", "updated": "2026-11-24T11:35:00Z"}, "expect": {"cls": "warn", "source": "check", "value": 25}},
+  {"name": "live failing, the scheduled check takes over", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": {"failed_at": "2026-11-24T11:59:00Z"}, "check": {"key": "smn", "checked": "2026-11-24T11:50:00Z", "status": "ok", "updated": "2026-11-24T11:45:00Z"}, "expect": {"cls": "ok", "source": "check", "value": 15}},
+  {"name": "a failed measurement of the scheduled check does not count", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": {"failed_at": "2026-11-24T11:59:00Z"}, "check": {"key": "smn", "checked": "2026-11-24T11:50:00Z", "status": "bad", "reason": "check_failed"}, "expect": {"cls": "unknown", "source": null, "value": null}},
+  {"name": "first live query still running, no scheduled check", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": null, "check": null, "expect": {"cls": "checking", "source": null, "value": null}},
+  {"name": "first live query still running, scheduled check expired", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": null, "check": {"key": "smn", "checked": "2026-11-24T10:00:00Z", "status": "ok", "updated": "2026-11-24T09:55:00Z"}, "expect": {"cls": "stale", "source": null, "value": null}},
+  {"name": "live failing recently, nothing current", "item": "smn", "now": "2026-11-24T12:00:00Z", "live": {"m": {"updated": "2026-11-24T11:20:00Z"}, "measured_at": "2026-11-24T11:25:00Z", "failed_at": "2026-11-24T11:58:00Z"}, "check": {"key": "smn", "checked": "2026-11-24T10:00:00Z", "status": "ok"}, "expect": {"cls": "unknown", "source": null, "value": null}},
+  {"name": "everything expired, also the failures", "item": "smn", "now": "2026-11-24T14:00:00Z", "live": {"m": {"updated": "2026-11-24T11:20:00Z"}, "measured_at": "2026-11-24T11:25:00Z", "failed_at": "2026-11-24T11:58:00Z"}, "check": null, "expect": {"cls": "stale", "source": null, "value": null}},
+  {"name": "latency from the scheduled check, with its model run", "item": "local-forecasting", "now": "2026-11-24T12:10:00Z", "live": {"failed_at": "2026-11-24T12:09:00Z"}, "check": {"key": "local-forecasting", "checked": "2026-11-24T11:40:00Z", "status": "ok", "ref_time": "2026-11-24T11:00:00Z", "available": "2026-11-24T11:12:00Z", "run_files": 30, "run_files_expected": 30, "run_complete": true}, "expect": {"cls": "ok", "source": "check", "value": 12}},
+  {"name": "static stays static", "item": "climate-normals-grid", "now": "2026-11-24T12:00:00Z", "live": null, "check": null, "expect": {"cls": "static", "source": null, "value": null}}
  ]
 }

@@ -13,7 +13,8 @@ How up to date the MeteoSwiss open data are on the [STAC API](https://data.geo.a
 | Path | Purpose |
 |:--|:--|
 | `config.json` | Single configuration for page and check: monitored collections, group A–E, metric, intervals, thresholds, names in de/fr/it/en, documentation links |
-| `src/` | Page (React, bundled with esbuild): `main.jsx` frame and language choice, `OgdMonitor.jsx` page content, `Strip.jsx` history strip, `Incidents.jsx` incident list, `stac.js` live measurement, `rules.mjs` rating rules, `format.jsx` formatting, `strings.js` texts |
+| `src/` | Page (React, bundled with esbuild): `main.jsx` frame and language choice, `Header.jsx` header as on opendatadocs.meteoswiss.ch, `OgdMonitor.jsx` page content, `Strip.jsx` history strip, `Incidents.jsx` incident list, `stac.mjs` live measurement with time limits, `rules.mjs` rating rules and how long a measurement counts, `format.jsx` formatting, `strings.js` texts |
+| `static/` | Copied into the page as is: MeteoSwiss logos per language and favicon (from [MeteoSwiss/opendata](https://github.com/MeteoSwiss/opendata), the documentation) |
 | `scripts/ogd_monitor.py` | Check for the history (Python standard library only) |
 | `corrections.json` | Corrections of history entries that were measured wrongly; applied on every run, can be emptied once its entries are older than 30 days |
 | `tests/` | Tests without network, run by the workflow before every check (`npm test`). `cases.json` holds shared cases of the rating rules, which exist twice: in `scripts/ogd_monitor.py` and in `src/rules.mjs`. A rule change needs both files and a case in `cases.json`. |
@@ -52,6 +53,7 @@ Items in their winter break are still measured and shown in grey, but do not cou
 - **Overview**: one strip per group A–E for the last 72 hours, one bar per hour. A bar is green when all datasets of the group were up to date, red when none was, otherwise orange.
 - **Opening a group** shows its datasets with key figure, status and their own strip. Deep links open the group: `#group-D` or `#monitor-<key>`, e.g. `#monitor-radar-rzc`.
 - **Incidents**: list of the last 30 days below the overview (five shown, more on request); clicking a failed hour in a strip jumps to its incident. Deep link: `#incident-<id>`.
+- **Current status, always dated**: every dataset is queried on its own, with a time limit per request (20 s) and per measurement (60 s), so a stalled request only affects its own dataset. The page rates at the current time (it advances every 30 s, also without new results) and only with measurements that are still current: a live result counts for two refresh intervals (10 min), then the latest scheduled check takes over if it is at most 60 minutes old. Without a current measurement a dataset shows «unknown» or «no current status» in grey, never green. The headline says where the status comes from and from when. If the scheduled check has not run for over an hour, the page says so.
 - **Notes**: the intro links to the operational status of geo.admin.ch, group A to the data availability of the ground-based stations.
 
 ## JSON endpoint

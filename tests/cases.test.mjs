@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {test} from 'node:test';
-import {classify, parseRef, pauseEnd, refFromName, selectRun} from '../src/rules.mjs';
+import {classify, currentStatus, parseRef, pauseEnd, refFromName, selectRun} from '../src/rules.mjs';
 
 const read = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url), 'utf8'));
 const CASES = read('./cases.json');
@@ -54,6 +54,22 @@ test('selectRun', async (tc) => {
       const r = selectRun(runs, t(c.now), c.ok_max_min);
       const got = r.ref ? {ref: iso(r.ref), available: iso(r.available), run: r.run} : null;
       assert.deepEqual(got, c.expect);
+    });
+  }
+});
+
+// browser only: which measurement counts, and for how long
+test('currentStatus', async (tc) => {
+  const limits = {liveMaxMs: 10 * 60e3, checkMaxMs: 60 * 60e3};
+  const measurement = (m) => Object.fromEntries(Object.entries(m || {}).map(([k, v]) => [k, t(v)]));
+  for (const c of CASES.current_status) {
+    await tc.test(c.name, () => {
+      const live = c.live && {m: measurement(c.live.m), measuredAt: t(c.live.measured_at), failedAt: t(c.live.failed_at)};
+      const r = currentStatus(item(c.item), t(c.now), live || undefined, c.check || undefined, limits);
+      assert.equal(r.cls, c.expect.cls);
+      assert.equal(r.source, c.expect.source);
+      if (c.expect.value === null) assert.equal(r.value, null);
+      else assert.ok(Math.abs(r.value - c.expect.value) <= 0.1, `value ${r.value}, expected ${c.expect.value}`);
     });
   }
 });

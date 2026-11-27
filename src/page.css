@@ -23,8 +23,8 @@ h1 { font-size: 32px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.01em
   border-top: 1px solid #e1e5e8; padding-top: 16px; padding-bottom: 32px;
   font-size: 14px; color: #626a73;
 }
-.footer nav { display: flex; gap: 12px; }
-.footer strong { color: #202224; }
+
+
 .monitor table { border-collapse: collapse; width: 100%; }
 .monitor th, .monitor td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid #e1e5e8; font-size: 14px; }
 
@@ -34,5 +34,64 @@ h1 { font-size: 32px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.01em
   .beta { font-size: 11px; margin-left: 6px; }
   .intro { font-size: 15px; margin-bottom: 18px; }
   .footer { font-size: 13px; }
-  .footer nav a, .footer nav strong { padding: 6px 2px; }
+
+}
+
+/* Header as on opendatadocs.meteoswiss.ch (Docusaurus/Infima navbar with the MeteoSwiss settings:
+   height 4.75rem, logo 4rem, title 2rem, hidden below 997px; colors of its custom.css) */
+.navbar {
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  height: 4.75rem; padding: 0.5rem 1rem;
+  background: #fff; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+}
+.navbar__brand { display: flex; align-items: center; min-width: 0; height: 100%; color: #1c1e21; text-decoration: none; }
+.navbar__brand:hover { color: #2f4356; }
+.navbar__logo { height: 4rem; width: auto; flex: 0 0 auto; margin-right: 1rem; }
+.navbar__title { font-size: 2rem; font-weight: 700; padding-left: 1.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.navbar__items { display: flex; align-items: center; flex: 0 0 auto; }
+.navbar__link {
+  padding: 0.25rem 0.75rem; font-size: 1rem; font-weight: 500; line-height: 1.65;
+  color: #1c1e21; text-decoration: none; background: none; border: 0; font-family: inherit; cursor: pointer;
+}
+.navbar__link:hover, .dropdown--open .navbar__link { color: #2f4356; }
+.navbar__link[target="_blank"]::after {
+  display: inline-block; content: ''; width: 1.2em; height: 1.2em; margin: -0.3em -0.2em -0.25em 0.05em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7.15 6.95l9.8.1.1 9.8-1.95.01-.01-6.44-8 7.99-1.38-1.38 8.12-8.12-6.69-.01V6.95z' fill='%23000' fill-rule='evenodd'/%3E%3C/svg%3E") no-repeat 50% 50%; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7.15 6.95l9.8.1.1 9.8-1.95.01-.01-6.44-8 7.99-1.38-1.38 8.12-8.12-6.69-.01V6.95z' fill='%23000' fill-rule='evenodd'/%3E%3C/svg%3E") no-repeat 50% 50%;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.dropdown { position: relative; }
+.dropdown__toggle::after {
+  content: ''; display: inline-block; position: relative; top: -0.15em; margin-left: 0.3em;
+  border-style: solid; border-width: 0.4em 0.4em 0; border-color: currentColor transparent;
+}
+.dropdown__menu {
+  position: absolute; right: 0; top: calc(100% + 0.3rem); min-width: 10rem;
+  margin: 0; padding: 0.5rem; list-style: none;
+  background: #fff; border-radius: 0.4rem; box-shadow: 0 5px 40px rgba(0, 0, 0, 0.2);
+  visibility: hidden; opacity: 0; transform: translateY(-0.625rem);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+/* opens on hover (desktop, as on the documentation) and on click or keyboard */
+.dropdown:hover .dropdown__menu, .dropdown--open .dropdown__menu, .dropdown:focus-within .dropdown__menu {
+  visibility: visible; opacity: 1; transform: translateY(0);
+}
+.dropdown__link {
+  display: block; margin-top: 0.2rem; padding: 0.25rem 0.5rem; border-radius: 0.25rem;
+  font-size: 0.875rem; color: #1c1e21; text-decoration: none; white-space: nowrap;
+}
+.dropdown__link:hover { background: #ebedf0; }
+.dropdown__link--active { background: #f2f3f5; color: #2f4356; font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .dropdown__menu { transition: none; } }
+
+@media (max-width: 996px) {
+  .navbar__title { display: none; }
+}
+@media (max-width: 650px) {
+  .navbar { height: 3.75rem; padding: 0.5rem 0.5rem 0.5rem 0.75rem; }
+  .navbar__logo { height: 2.75rem; margin-right: 0; }
+  /* documentation and source code are in the footer */
+  .navbar__extra { display: none; }
 }

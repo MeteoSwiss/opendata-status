@@ -81,3 +81,48 @@ export function selectRun(runs, now, okMaxMin) {
   const prev = order.slice(1).find((k) => runs.get(k).length >= expected);
   return prev !== undefined ? result(prev, true) : result(order[0], false);
 }
+
+// ---------- freshness (browser only) ----------
+// The page always rates at the current time and only with measurements that are still current, so
+// that it never keeps showing an old green result.
+
+// Measurement of a row of status.json (latest scheduled check), in the form measure() returns
+export function measurementFromCheck(row) {
+  const d = (s) => (s ? new Date(s) : null);
+  return {
+    updated: d(row.updated),
+    ref: d(row.ref_time),
+    available: d(row.available),
+    modelRun: d(row.model_run),
+    run: row.run_files !== undefined ? {files: row.run_files, expected: row.run_files_expected, complete: row.run_complete} : undefined,
+    stations: row.stations_total !== undefined ? {total: row.stations_total, ok: row.stations_ok, stale: row.stations_stale || []} : undefined,
+  };
+}
+
+// Which measurement to rate for one item at time `now`:
+//   1. the live query of the browser, if it succeeded within liveMaxMs;
+//   2. else the latest scheduled check, if it ran within checkMaxMs and its measurement succeeded;
+//   3. else nothing: cls 'checking' (first live query still running), 'unknown' (live query failed
+//      recently) or 'stale' (all information expired).
+// live: {m, measuredAt (last success), failedAt (last failure)} or undefined; check: row of status.json.
+// Returns {source: 'live' | 'check' | null, m, at (time of the measurement), cls (only without measurement)}.
+export function pickMeasurement(live, check, now, {liveMaxMs, checkMaxMs}) {
+  const fresh = (at, maxMs) => Boolean(at) && now - at <= maxMs;
+  if (live && fresh(live.measuredAt, liveMaxMs)) return {source: 'live', m: live.m, at: live.measuredAt};
+  const checked = check && new Date(check.checked);
+  if (check && check.reason !== 'check_failed' && fresh(checked, checkMaxMs)) {
+    return {source: 'check', m: measurementFromCheck(check), at: checked};
+  }
+  const last = [live && live.measuredAt, checked].filter(Boolean).sort((a, b) => b - a)[0] || null;
+  if (!live) return {source: null, m: {}, at: last, cls: last ? 'stale' : 'checking'};
+  if (fresh(live.failedAt, liveMaxMs)) return {source: null, m: {}, at: last, cls: 'unknown'};
+  return {source: null, m: {}, at: last, cls: last ? 'stale' : 'unknown'};
+}
+
+// Status of one item at time `now`: pickMeasurement plus classify. Returns {source, m, at, cls, value, stalled}.
+export function currentStatus(c, now, live, check, limits) {
+  const p = pickMeasurement(live, check, now, limits);
+  if (c.ok_max_min === null) return {...p, cls: 'static', value: null};
+  if (p.cls) return {...p, value: null};
+  return {...p, ...classify(c, now, p.m)};
+}

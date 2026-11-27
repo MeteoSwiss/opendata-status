@@ -2,8 +2,8 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import config from '../config.json';
 import strings from './strings';
 import styles from './styles.module.css';
-import {classify} from './rules.mjs';
-import {fetchJson, measure} from './stac';
+import {currentStatus} from './rules.mjs';
+import {fetchJson, measureWithDeadline} from './stac.mjs';
 import {fmtAge, fmtClock, fmtPct, fmtTime, segments} from './format';
 import Strip from './Strip';
 import Incidents from './Incidents';
@@ -27,6 +27,12 @@ const DOCS = 'https://opendatadocs.meteoswiss.ch';
 // Link to the documentation page in the same language (English has no prefix)
 const docUrl = (doc, locale) => `${DOCS}${locale === 'en' ? '' : '/' + locale}${doc}`;
 const GOAL = 0.95;
+// The page rates at the current time, which advances every TICK_MS even when no query returns.
+const TICK_MS = 30e3;
+// The latest scheduled check counts for this long (it runs every 30 minutes); also the limit after
+// which the page says that the scheduled check has stopped.
+const CHECK_MAX_MS = 60 * 60e3;
+const KNOWN = ['ok', 'warn', 'bad'];
 const GROUPS = ['A', 'B', 'C', 'D', 'E'];
 
 // Group to open for a deep link: #group-D or #monitor-<item key>
@@ -42,8 +48,11 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   const t = strings(locale);
   const name = (c) => c.name[locale] || c.name.en;
 
-  const [live, setLive] = useState(null); // {checked: Date, m: {key: measurement|undefined}}
-  const [history, setHistory] = useState(null); // {summary: [], items: []} or {error}
+  // live query per dataset: {m, measuredAt (start of the last successful query), failedAt}
+  const [live, setLive] = useState({});
+  const [history, setHistory] = useState(null); // {summary, items, latest, incidents, error, loadedAt}
+  const [now, setNow] = useState(() => new Date());
+  const liveMaxMs = 2 * refreshMinutes * 60e3; // a live result counts for two refresh intervals
   const [openGroups, setOpenGroups] = useState(() => new Set(groupFromHash()));
   const toggleGroup = (g) => setOpenGroups((prev) => {
     const next = new Set(prev);
@@ -56,74 +65,116 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const loadLive = useCallback(async () => {
-    const results = await Promise.allSettled(config.items.map((c) => measure(config.stac_api, c)));
-    const m = {};
-    config.items.forEach((c, i) => {
-      m[c.key] = results[i].status === 'fulfilled' ? results[i].value : undefined; // undefined = query failed
+  // Each dataset is queried on its own and updates the page as soon as it returns; a dataset whose
+  // query is still running is skipped, so that stalled queries do not pile up.
+  const running = useRef(new Set());
+  const loadLive = useCallback(() => {
+    config.items.forEach(async (c) => {
+      if (running.current.has(c.key)) return;
+      running.current.add(c.key);
+      const started = new Date();
+      try {
+        const m = await measureWithDeadline(config.stac_api, c);
+        setLive((prev) => ({...prev, [c.key]: {...prev[c.key], m, measuredAt: started}}));
+      } catch {
+        setLive((prev) => ({...prev, [c.key]: {...prev[c.key], failedAt: new Date()}}));
+      } finally {
+        running.current.delete(c.key);
+        setNow(new Date());
+      }
     });
-    setLive({checked: new Date(), m});
   }, []);
 
+  const historyRunning = useRef(false);
   const loadHistory = useCallback(async () => {
+    if (historyRunning.current) return;
+    historyRunning.current = true;
     try {
       const [summary, items, latest, incidentsDoc] = await Promise.all([
         fetchJson(`${dataUrl}/history.json`),
         fetchJson(`${dataUrl}/history_items.json`),
-        // latest scheduled check, for its download test of the newest file per dataset
+        // latest scheduled check: download test, and fallback when the live query fails
         fetchJson(`${dataUrl}/status.json`).catch(() => []),
         fetchJson(`${dataUrl}/incidents.json`).catch(() => null),
       ]);
-      setHistory({summary, items, latest, incidents: incidentsDoc ? incidentsDoc.incidents : null});
-    } catch (e) {
-      setHistory({error: true, summary: [], items: []});
+      setHistory({summary, items, latest, incidents: incidentsDoc ? incidentsDoc.incidents : null, loadedAt: new Date()});
+    } catch {
+      // keep what was loaded before; its age shows in the notice about the scheduled check
+      setHistory((prev) => (prev ? {...prev, error: true} : {error: true, summary: [], items: [], latest: []}));
+    } finally {
+      historyRunning.current = false;
     }
   }, [dataUrl]);
 
   useEffect(() => {
-    loadLive();
-    loadHistory();
-    const id = setInterval(() => { loadLive(); loadHistory(); }, refreshMinutes * 60e3);
-    return () => clearInterval(id);
+    const refresh = () => { setNow(new Date()); loadLive(); loadHistory(); };
+    refresh();
+    const tick = setInterval(() => setNow(new Date()), TICK_MS);
+    const poll = setInterval(refresh, refreshMinutes * 60e3);
+    // timers are throttled in background tabs and stop while the computer sleeps:
+    // when the page becomes visible again, rate at the current time and query at once
+    const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { clearInterval(tick); clearInterval(poll); document.removeEventListener('visibilitychange', onVisible); };
   }, [loadLive, loadHistory, refreshMinutes]);
 
   const rows = useMemo(() => {
-    if (!live) return null;
+    const latestByKey = Object.fromEntries(((history && history.latest) || []).map((x) => [x.key, x]));
     return config.items.map((c) => {
-      const m = live.m[c.key];
-      const res = classify(c, live.checked, m || {});
-      let cls = m === undefined && res.cls !== 'static' ? 'unknown' : res.cls;
+      const latest = latestByKey[c.key];
+      const res = currentStatus(c, now, live[c.key], latest, {liveMaxMs, checkMaxMs: CHECK_MAX_MS});
+      let cls = res.cls;
       // The browser only reads the catalog; whether the newest file can actually be downloaded is
       // tested by the scheduled check (every 30 min). A failed test from the last hour makes the
       // dataset down, even if the catalog looks fresh.
-      const latest = ((history && history.latest) || []).find((x) => x.key === c.key);
       const access = latest && latest.access;
-      const recent = latest && live.checked - new Date(latest.checked) < 60 * 60e3;
+      const recent = latest && now - new Date(latest.checked) < CHECK_MAX_MS;
       const noAccess = access && !access.ok && recent && ['ok', 'warn'].includes(cls) ? {...access, checked: new Date(latest.checked)} : null;
       if (noAccess) cls = 'bad';
-      return {c, m: m || {}, value: res.value, stalled: res.stalled, cls, noAccess};
+      return {c, m: res.m, value: res.value, stalled: res.stalled, cls, noAccess, source: res.source, at: res.at};
     });
-  }, [live, history]);
+  }, [now, live, history, liveMaxMs]);
 
   // deep link: once the data are there, scroll to the opened group or dataset
   const scrolled = useRef(false);
   useEffect(() => {
-    if (!rows || scrolled.current || !window.location.hash) return;
+    if (scrolled.current || !window.location.hash || rows.every((r) => r.cls === 'checking')) return;
     scrolled.current = true;
     const el = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
     if (el) requestAnimationFrame(() => el.scrollIntoView());
   }, [rows]);
 
-  if (!rows) return <p className={styles.loading}>{t.loading}</p>;
-
   const monitored = rows.filter((r) => r.cls !== 'static' && r.cls !== 'pause');
   const realtime = monitored.filter((r) => r.c.realtime);
   const nOk = (a) => a.filter((r) => r.cls === 'ok').length;
+  // status of several datasets: green only when every one has a current status and is up to date;
+  // grey when there is no current status (still querying, failed or expired)
+  const overall = (list) => {
+    const known = list.filter((r) => KNOWN.includes(r.cls));
+    if (!known.length) return list.some((r) => r.cls === 'checking') ? 'checking' : 'unknown';
+    const ok = nOk(known);
+    if (ok < known.length) return ok === 0 ? 'bad' : 'warn';
+    return known.length === list.length ? 'ok' : 'unknown';
+  };
   const rtOk = nOk(realtime);
   const monOk = nOk(monitored);
-  const problems = monitored.length - monOk;
-  const rtCls = rtOk === realtime.length ? 'ok' : rtOk === 0 ? 'bad' : 'warn';
-  const dotCls = rtCls === 'ok' && problems ? 'warn' : rtCls;
+  const problems = monitored.filter((r) => r.cls === 'warn' || r.cls === 'bad').length;
+  const rtCls = overall(realtime);
+  const allCls = overall(monitored);
+  // headline dot: a known problem comes first (real-time datasets as they are, others as delayed),
+  // then green only if everything is current and up to date, else grey
+  const problem = (cls) => cls === 'warn' || cls === 'bad';
+  const dotCls = problem(rtCls) ? rtCls : problem(allCls) ? 'warn'
+    : rtCls === 'ok' && allCls === 'ok' ? 'ok' : [rtCls, allCls].includes('checking') ? 'checking' : 'unknown';
+  // where the shown status comes from, and how old it is (oldest measurement per source)
+  const oldest = (source) => {
+    const ats = monitored.filter((r) => r.source === source).map((r) => +r.at);
+    return ats.length ? new Date(Math.min(...ats)) : null;
+  };
+  const liveAt = oldest('live');
+  const checkAt = oldest('check');
+  const asOf = [liveAt && t.liveAt(fmtTime(liveAt, t, true)), checkAt && t.checkAt(fmtTime(checkAt, t, true))]
+    .filter(Boolean).join(' · ') || t.noCurrent;
 
   const hist = history || {summary: [], items: []};
   const incidents = (history && history.incidents) || [];
@@ -132,7 +183,10 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   const totRt = hist.summary.reduce((s, h) => s + h.realtime_total, 0);
   const avg30 = totRt ? sumRt / totRt : null;
   const allChecks = [...hist.summary.map((h) => +new Date(h.checked))];
-  const firstEver = allChecks.length ? new Date(Math.min(...allChecks)) : live.checked;
+  const firstEver = allChecks.length ? new Date(Math.min(...allChecks)) : now;
+  // the scheduled check runs every 30 minutes: say so when it has stopped (e.g. workflow disabled)
+  const lastCheck = allChecks.length ? new Date(Math.max(...allChecks)) : null;
+  const checkOverdue = history && lastCheck && now - lastCheck > CHECK_MAX_MS;
 
   // short text of what was measured: latency or age of the newest data
   const describe = (r) => {
@@ -141,13 +195,15 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
     return t.valAge(fmtAge(r.value, t));
   };
 
-  const late = monitored.filter((r) => r.cls !== 'ok');
+  const late = monitored.filter((r) => r.cls !== 'ok' && r.cls !== 'checking');
   const out = late.filter((r) => r.cls === 'bad');
   const delayed = late.filter((r) => r.cls === 'warn');
-  const unknown = late.filter((r) => r.cls === 'unknown');
+  const unknown = late.filter((r) => r.cls === 'unknown' || r.cls === 'stale');
   const unreachable = out.filter((r) => r.noAccess);
   const stale = out.filter((r) => !r.noAccess);
-  const title = !late.length ? t.allOk : [
+  const anyChecking = monitored.some((r) => r.cls === 'checking');
+  const title = !late.length ? (anyChecking ? t.loading : t.allOk)
+    : unknown.length === monitored.length ? t.noCurrent : [
     stale.length && t.noNew + stale.map((r) => `${name(r.c)} (${describe(r)})`).join(', '),
     unreachable.length && t.notDownloadableList + unreachable.map((r) => `${name(r.c)} (${r.noAccess.host})`).join(', '),
     delayed.length && t.delayedList + delayed.map((r) => name(r.c)).join(', '),
@@ -164,7 +220,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
       const why = p.reason ? ` · ${t.reasons[p.reason] || p.reason}${p.detail ? ` (${p.detail})` : ''}` : '';
       return {t: new Date(p.checked), cls, text: `${t.status[cls] || cls} · ${v}${why}`};
     });
-    if (r.cls !== 'unknown') pts.push({t: live.checked, cls: r.cls, text: `${t.status[r.cls]} · ${describe(r)} (${t.live})`});
+    // the live query as the newest point (results of the scheduled check are in the history already)
+    if (r.source === 'live') pts.push({t: r.at, cls: r.cls, text: `${t.status[r.cls]} · ${describe(r)} (${t.live} ${fmtClock(r.at, t)})`});
     return pts;
   };
 
@@ -189,7 +246,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         </div>
         {r.c.monitoring_pending
           ? <p className={styles.pending}>{t.pending}</p>
-          : <Strip checks={itemChecks(r)} end={live.checked} firstEver={firstEver} t={t}
+          : <Strip checks={itemChecks(r)} end={now} firstEver={firstEver} t={t}
               incidents={incidents.filter((x) => x.datasets.some((d) => d.key === r.c.key))} />}
         <p className={styles.statLine}>{segments(r.c.collection.replace('ch.meteoschweiz.', '') + ' · ' + (r.c.metric === 'latency'
           ? t.metaLat(fmtAge(r.c.ok_max_min, t), fmtTime(r.m.ref, t))
@@ -199,7 +256,9 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
           : t.metaAge(t.interval[r.c.interval], fmtTime(r.m.updated, t))
             + (r.m.modelRun ? ` · ${t.modelRun(fmtTime(r.m.modelRun, t))}` : ''))
           + (r.noAccess ? ` · ${t.notDownloadable(r.noAccess.host, r.noAccess.error || `HTTP ${r.noAccess.http_status}`)} (${t.check} ${fmtClock(r.noAccess.checked, t)})` : '')
-          + (r.c.season ? ` · ${t.pauseInfo}` : ''))}</p>
+          + (r.c.season ? ` · ${t.pauseInfo}` : '')
+          + (r.source === 'check' ? ` · ${t.fromCheck(fmtClock(r.at, t))}` : '')
+          + (r.cls === 'stale' && r.at ? ` · ${t.lastStatus(fmtTime(r.at, t))}` : ''))}</p>
       </div>
   );
 
@@ -222,13 +281,17 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         ps.filter((p) => p.status !== 'ok').map((p) => `${name(byKey.get(p.key).c)}: ${t.status[p.status] || p.status}`),
         `${t.check} ${fmtClock(checked, t)}`),
     }));
+    // the live query as the newest point, only when every dataset of the group has a current live result
     const rated = list.filter((r) => r.cls !== 'pause');
-    pts.push({
-      t: live.checked,
-      ...summarize(rated.length, nOk(rated),
-        rated.filter((r) => r.cls !== 'ok').map((r) => `${name(r.c)}: ${t.status[r.cls]}`),
-        `${t.live} ${fmtClock(live.checked, t)}`),
-    });
+    if (rated.length && rated.every((r) => r.source === 'live' && KNOWN.includes(r.cls))) {
+      const at = new Date(Math.min(...rated.map((r) => +r.at)));
+      pts.push({
+        t: at,
+        ...summarize(rated.length, nOk(rated),
+          rated.filter((r) => r.cls !== 'ok').map((r) => `${name(r.c)}: ${t.status[r.cls]}`),
+          `${t.live} ${fmtClock(at, t)}`),
+      });
+    }
     return pts;
   };
 
@@ -238,7 +301,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         <span className={`${styles.bigdot} ${styles[dotCls]}`} aria-hidden="true" />
         <div>
           <p className={styles.hlTitle}>{title}</p>
-          <p className={styles.muted}>{t.lead(rtOk, realtime.length, fmtTime(live.checked, t, true))}</p>
+          <p className={styles.muted}>{t.lead(rtOk, realtime.length, asOf)}</p>
         </div>
       </div>
 
@@ -251,7 +314,8 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
           ))}
         </div>
         <p className={`${styles.small} ${styles.greenMeans}`}>{t.greenMeans}</p>
-        {history && history.error && <p className={styles.notice}>{t.historyMissing}</p>}
+        {history && history.error && !lastCheck && <p className={styles.notice}>{t.historyMissing}</p>}
+        {checkOverdue && <p className={styles.notice} role="status">{t.checkOverdue(fmtTime(lastCheck, t, true))}</p>}
         <div className={styles.bars}>
           {GROUPS.map((g) => {
             // order as in config.json (= order of the documentation)
@@ -268,7 +332,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
             }
             const rated = list.filter((r) => r.cls !== 'pause');
             const ok = nOk(rated);
-            const cls = ok === rated.length ? 'ok' : ok === 0 ? 'bad' : 'warn';
+            const cls = overall(rated);
             const open = openGroups.has(g);
             return (
               <div key={g} className={styles.bar} id={`group-${g}`}>
@@ -282,7 +346,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
                   </button>
                   <span className={`${styles.status} ${styles[cls]}`}>{cls === 'ok' ? t.allCurrent : t.ofCurrent(ok, rated.length)}</span>
                 </div>
-                <Strip checks={groupChecks(list)} end={live.checked} firstEver={firstEver} t={t}
+                <Strip checks={groupChecks(list)} end={now} firstEver={firstEver} t={t}
                   incidents={incidents.filter((x) => x.datasets.some((d) => list.some((r) => r.c.key === d.key)))} />
                 {t.groupNote && t.groupNote[g] && (
                   <p className={styles.groupNote}>

@@ -1,4 +1,4 @@
-// Builds the static page into dist/: index.html, assets/main.{js,css}, config.json, data/, api/v1/status.json.
+// Builds the static page into dist/: index.html, assets/main.{js,css}, static/ (logos, favicon), config.json, data/, api/v1/status.json.
 // `npm start` serves it on http://localhost:8000 with local data from ./data or ./seed.
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
@@ -12,6 +12,8 @@ fs.mkdirSync('dist/data', {recursive: true});
 fs.writeFileSync('dist/index.html', fs.readFileSync('index.html', 'utf8').replace('__SOURCE_URL__', source));
 fs.copyFileSync('config.json', 'dist/config.json');
 fs.writeFileSync('dist/.nojekyll', '');
+// logos (as on opendatadocs.meteoswiss.ch), favicon, icons
+fs.cpSync('static', 'dist', {recursive: true});
 // local preview: use existing history if present (the workflow copies fresh data afterwards)
 for (const dir of ['data', 'seed']) {
   if (fs.existsSync(`${dir}/history.json`)) {

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.mjs",
     "start": "node build.mjs --serve",
-    "test": "node --test tests/cases.test.mjs && python3 -m unittest discover -s tests"
+    "test": "node --test tests/cases.test.mjs tests/stac.test.mjs && python3 -m unittest discover -s tests"
   },
   "dependencies": {
     "react": "^18.3.1",

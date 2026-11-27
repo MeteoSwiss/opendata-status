@@ -254,6 +254,9 @@
 .bin.pre, .swatch.pre { background: var(--m-pre); }
 .bin.pause, .swatch.pause, .status.pause::before { background: #a9b6c3; }
 .status.pause { color: var(--m-muted); }
+/* no current status: still querying, query failed or all information expired; never green */
+.bigdot.unknown, .bigdot.checking, .bin.unknown, .bin.stale, .status.unknown::before, .status.stale::before, .status.checking::before { background: var(--m-unknown); }
+.status.unknown, .status.stale, .status.checking { color: var(--m-muted); }
 .swatch.empty { background: var(--m-empty); }
 .status.ok, .statValue.ok { color: var(--m-green-text); }
 .status.warn, .statValue.warn { color: var(--m-amber-text); }
