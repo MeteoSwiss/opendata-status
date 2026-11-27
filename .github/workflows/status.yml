@@ -45,6 +45,13 @@ jobs:
             cp seed/history.json seed/history_items.json data/
           fi
 
+# the rating rules exist in Python (check, history) and JavaScript (live status in the
+# browser); both run the shared cases in tests/cases.json
+      - name: Test
+        run: |
+          python3 -m unittest discover -s tests
+          node --test tests/cases.test.mjs tests/stac.test.mjs
+      
       - name: Run check
         run: python3 scripts/ogd_monitor.py --config config.json --data data
 
