@@ -35,6 +35,18 @@ const STRINGS = {
     ongoing: 'ongoing',
     showAll: (n) => `Show all ${n}`,
     toIncident: 'Click for the incident',
+    bf: {
+      clock: '',
+      colon: ': ',
+      colon: ' : ',
+      colon: ': ',
+      late: (u, n, rs, d) => (u === 'run' ? (n === 1 ? `run ${rs} delivered late (${d})` : `runs ${rs} delivered late (up to ${d})`)
+        : (n === 1 ? `1 image ${rs} delivered late (${d})` : `${n} images ${rs} delivered late (up to ${d})`)),
+      incomplete: (u, n, rs, f, tot) => (n === 1 ? `run ${rs} incomplete (${f} of ${tot} files)` : `runs ${rs} incomplete`),
+      missing: (u, n, rs) => (u === 'run' ? (n === 1 ? `run ${rs} missing` : `runs ${rs} missing`)
+        : (n === 1 ? `1 image missing (${rs})` : `${n} images missing (${rs})`)),
+      allOnTime: (u) => (u === 'run' ? 'all runs available on time' : 'all images available on time'),
+    },
     duration: 'Duration',
     layerLabel: 'Likely layer: ',
     layers: {dataset: 'single dataset', delivery: 'data delivery of several datasets', storage: 'data storage', catalog: 'STAC API (nearly all datasets)'},
@@ -120,6 +132,16 @@ const STRINGS = {
     ongoing: 'andauernd',
     showAll: (n) => `Alle ${n} anzeigen`,
     toIncident: 'Klicken für den Vorfall',
+    bf: {
+      clock: ' Uhr',
+      colon: ': ',
+      late: (u, n, rs, d) => (u === 'run' ? (n === 1 ? `Lauf ${rs} verspätet nachgeliefert (${d})` : `Läufe ${rs} verspätet nachgeliefert (bis ${d})`)
+        : (n === 1 ? `1 Bild ${rs} verspätet nachgeliefert (${d})` : `${n} Bilder ${rs} verspätet nachgeliefert (bis ${d})`)),
+      incomplete: (u, n, rs, f, tot) => (n === 1 ? `Lauf ${rs} unvollständig (${f} von ${tot} Dateien)` : `Läufe ${rs} unvollständig`),
+      missing: (u, n, rs) => (u === 'run' ? (n === 1 ? `Lauf ${rs} fehlt` : `Läufe ${rs} fehlen`)
+        : (n === 1 ? `1 Bild fehlt (${rs})` : `${n} Bilder fehlen (${rs})`)),
+      allOnTime: (u) => (u === 'run' ? 'alle Läufe rechtzeitig vorhanden' : 'alle Bilder rechtzeitig vorhanden'),
+    },
     duration: 'Dauer',
     layerLabel: 'Vermutete Ebene: ',
     layers: {dataset: 'einzelner Datensatz', delivery: 'Datenlieferung mehrerer Datensätze', storage: 'Datenspeicher', catalog: 'STAC API (fast alle Datensätze)'},
@@ -205,6 +227,15 @@ const STRINGS = {
     ongoing: 'en cours',
     showAll: (n) => `Afficher les ${n}`,
     toIncident: 'Cliquer pour l’incident',
+    bf: {
+      clock: '',
+      late: (u, n, rs, d) => (u === 'run' ? (n === 1 ? `run ${rs} livré en retard (${d})` : `runs ${rs} livrés en retard (jusqu’à ${d})`)
+        : (n === 1 ? `1 image ${rs} livrée en retard (${d})` : `${n} images ${rs} livrées en retard (jusqu’à ${d})`)),
+      incomplete: (u, n, rs, f, tot) => (n === 1 ? `run ${rs} incomplet (${f} fichiers sur ${tot})` : `runs ${rs} incomplets`),
+      missing: (u, n, rs) => (u === 'run' ? (n === 1 ? `run ${rs} manquant` : `runs ${rs} manquants`)
+        : (n === 1 ? `1 image manquante (${rs})` : `${n} images manquantes (${rs})`)),
+      allOnTime: (u) => (u === 'run' ? 'tous les runs disponibles à temps' : 'toutes les images disponibles à temps'),
+    },
     duration: 'Durée',
     layerLabel: 'Niveau probable : ',
     layers: {dataset: 'jeu de données isolé', delivery: 'livraison de plusieurs jeux de données', storage: 'stockage des données', catalog: 'API STAC (presque tous les jeux de données)'},
@@ -290,6 +321,15 @@ const STRINGS = {
     ongoing: 'in corso',
     showAll: (n) => `Mostra tutti i ${n}`,
     toIncident: 'Clicca per l’incidente',
+    bf: {
+      clock: '',
+      late: (u, n, rs, d) => (u === 'run' ? (n === 1 ? `corsa ${rs} fornita in ritardo (${d})` : `corse ${rs} fornite in ritardo (fino a ${d})`)
+        : (n === 1 ? `1 immagine ${rs} fornita in ritardo (${d})` : `${n} immagini ${rs} fornite in ritardo (fino a ${d})`)),
+      incomplete: (u, n, rs, f, tot) => (n === 1 ? `corsa ${rs} incompleta (${f} file su ${tot})` : `corse ${rs} incomplete`),
+      missing: (u, n, rs) => (u === 'run' ? (n === 1 ? `corsa ${rs} mancante` : `corse ${rs} mancanti`)
+        : (n === 1 ? `1 immagine mancante (${rs})` : `${n} immagini mancanti (${rs})`)),
+      allOnTime: (u) => (u === 'run' ? 'tutte le corse disponibili in tempo' : 'tutte le immagini disponibili in tempo'),
+    },
     duration: 'Durata',
     layerLabel: 'Livello probabile: ',
     layers: {dataset: 'singolo set di dati', delivery: 'fornitura di più set di dati', storage: 'archiviazione dei dati', catalog: 'API STAC (quasi tutti i set di dati)'},

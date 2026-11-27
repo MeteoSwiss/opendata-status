@@ -305,6 +305,8 @@
 .incWhen { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .incWhat { margin: 2px 0 0 !important; font-size: 14px; }
 .toIncident { color: var(--m-muted); font-style: italic; }
+.backfill { margin: 4px 0 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.45; }
+.backfill li + li { margin-top: 2px; }
 .more { margin-top: 10px; padding: 6px 12px; border: 1px solid var(--m-line); border-radius: 4px; background: none; font: inherit; font-size: 14px; color: inherit; cursor: pointer; }
 .more:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 0; }
 

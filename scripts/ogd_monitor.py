@@ -101,7 +101,8 @@ def ref_time_from_name(name, src):
         if not m:
             return None
         y, j, hh, mm = (int(g) for g in m.groups())
-        return dt.datetime(2000 + y, 1, 1, hh, mm, tzinfo=UTC) + dt.timedelta(days=j - 1)
+        # 2400 = midnight at the end of that day
+        return dt.datetime(2000 + y, 1, 1, tzinfo=UTC) + dt.timedelta(days=j - 1, hours=hh, minutes=mm)
     if src["time"] == "yyyymmddhhmm":  # e.g. vnut12.lssw.202611101500.tre200h0.csv
         m = re.search(r"(\d{12})", rest)
         return dt.datetime.strptime(m.group(1), "%Y%m%d%H%M").replace(tzinfo=UTC) if m else None
@@ -210,7 +211,64 @@ def failure_reason(c, now, status, updated, ref, run, access, error):
     return "late", None
 
 
-def build_incidents(cfg, history_items, now, join_min=60):
+def assess_backfill(api, c, episode, cache):
+    """After an episode has ended: which data of the gap came late, which are still missing.
+
+    Only for datasets whose file names carry their reference time (radar images, local forecast
+    runs); config `backfill` names prefix, time format and interval where `source` does not.
+    Expected are all reference times after the last one available at the start of the episode
+    that should have been available (reference time + target) by its end."""
+    spec = c.get("backfill") or (c["source"] if c.get("source", {}).get("kind") == "asset_name" else None)
+    if not spec or not episode.get("end"):
+        return None
+    start, end = parse_iso(episode["start"]), parse_iso(episode["end"])
+    step = dt.timedelta(minutes=spec.get("interval_min") or c["interval_min"])
+    target = c["ok_max_min"]
+    refs = {}  # reference time -> creation times of its files
+    day = (start - dt.timedelta(days=1)).date()
+    while day <= end.date():
+        key = (c["collection"], day)
+        if key not in cache:
+            try:
+                cache[key] = get_item(api, c["collection"], day.strftime("%Y%m%d") + "-ch")
+            except Exception:
+                cache[key] = None
+        for name, a in ((cache[key] or {}).get("assets") or {}).items():
+            ref = ref_time_from_name(name, spec)
+            created = a.get("created") or a.get("updated")
+            if ref and created:
+                refs.setdefault(ref, []).append(parse_iso(created))
+        day += dt.timedelta(days=1)
+    if not refs:  # items of that time no longer on the STAC API
+        return None
+    full = max(len(cs) for cs in refs.values()) if spec.get("complete_run") else 1
+    # last data that were complete before the episode began; the gap starts after them
+    before = [r for r, cs in refs.items() if len(cs) >= full and (max(cs) if spec.get("complete_run") else min(cs)) <= start]
+    if not before:
+        return None
+    late, missing, incomplete, on_time, worst = [], [], [], 0, 0.0
+    r = max(before) + step
+    while r + dt.timedelta(minutes=target) <= end:
+        cs = refs.get(r)
+        if not cs:
+            missing.append(iso(r))
+        elif len(cs) < full:
+            incomplete.append({"ref": iso(r), "files": len(cs)})
+        else:
+            # a run is there with its last file; an image with its first copy
+            delay = minutes(max(cs) if spec.get("complete_run") else min(cs), r)
+            if delay > target:
+                late.append(iso(r))
+                worst = max(worst, delay)
+            else:
+                on_time += 1
+        r += step
+    return {"unit": spec.get("unit") or ("run" if spec.get("complete_run") else "image"), "files_expected": full,
+            "interval_min": int(step.total_seconds() // 60), "late": late, "missing": missing,
+            "incomplete": incomplete, "on_time": on_time, "max_delay_min": worst, "assessed": iso(dt.datetime.now(UTC))}
+
+
+def build_incidents(cfg, history_items, now, join_min=60, api=None):
     """Incidents of the history window, newest first.
 
     An episode is a run of consecutive checks of one dataset that are not ok; it ends with the next
@@ -247,6 +305,14 @@ def build_incidents(cfg, history_items, now, join_min=60):
         if cur is not None:
             episodes.append(cur)
     episodes = [e for e in episodes if e["severity"] == "bad" or e["checks"] >= 2]
+    if api:
+        cfg_by_key = {c["key"]: c for c in cfg["items"]}
+        cache = {}
+        for e in episodes:
+            try:
+                e["backfill"] = assess_backfill(api, cfg_by_key[e["key"]], e, cache)
+            except Exception as err:  # the incident list works without it
+                print(f"warning: backfill {e['key']}: {err}", file=sys.stderr)
 
     incidents = []
     for e in sorted(episodes, key=lambda e: e["start"]):
@@ -284,7 +350,8 @@ def build_incidents(cfg, history_items, now, join_min=60):
             "severity": "bad" if any(e["severity"] == "bad" for e in ds) else "warn",
             "layer": layer,
             **({"hosts": hosts} if layer == "storage" else {}),
-            "datasets": [{k: e[k] for k in ("key", "start", "end", "severity", "checks", "reasons", "details")} for e in ds],
+            "datasets": [{**{k: e[k] for k in ("key", "start", "end", "severity", "checks", "reasons", "details")},
+                          **({"backfill": e["backfill"]} if e.get("backfill") else {})} for e in ds],
         })
     return {"generated": iso(now), "check_interval_min": 30, "incidents": sorted(out, key=lambda i: i["start"], reverse=True)}
 
@@ -655,7 +722,7 @@ def main():
 
     dump("status.json", rows)
     dump("api-status.json", api_status(cfg, rows, history, history_items, now, checked))
-    dump("incidents.json", build_incidents(cfg, history_items, now))
+    dump("incidents.json", build_incidents(cfg, history_items, now, api=api))
     dump("history.json", history)
     dump("history_items.json", history_items, compact=True)
     print(f"{checked}: real-time up to date {counts['realtime_ok']}/{counts['realtime_total']}, "
