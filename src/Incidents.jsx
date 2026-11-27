@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {fmtAge, fmtClock, fmtTime, segments} from './format';
+import {fmtAge, fmtClock, fmtRange, segments} from './format';
 import styles from './styles.module.css';
 
 // Consecutive reference times (ISO strings) as ranges «06:00–09:00», at most three, in local time
@@ -57,13 +57,15 @@ export default function Incidents({incidents, byKey, name, t}) {
           // «no new data» is replaced by what was delivered late or is missing, once that is assessed
           const covered = (r) => r === 'no_new_data' && x.datasets.filter((d) => d.reasons.includes(r)).every((d) => d.backfill);
           const reasons = [...new Set(x.datasets.flatMap((d) => d.reasons))].filter((r) => !covered(r));
-          const details = [...new Set(x.datasets.flatMap((d) => d.details))];
+          // «30/32» (files of an incomplete model run) as «30 of 32 files»
+          const details = [...new Set(x.datasets.flatMap((d) => d.details))]
+            .map((d) => { const f = /^(\d+)\/(\d+)$/.exec(d); return f ? t.filesOf(f[1], f[2]) : d; });
           return (
             <li key={x.id} id={`incident-${x.id}`}
               className={[styles.incident, `incident-${x.id}` === target && styles.target].filter(Boolean).join(' ')}>
               <div className={styles.row}>
                 <span className={styles.incWhen}>
-                  {fmtTime(new Date(x.start), t)} – {x.ongoing ? t.ongoing : fmtTime(new Date(x.end), t)}
+                  {x.ongoing ? `${fmtRange(new Date(x.start), null, t)}${t.ongoing}` : fmtRange(new Date(x.start), new Date(x.end), t)}
                 </span>
                 <span className={`${styles.status} ${styles[x.severity]}`}>{t.status[x.severity]}</span>
               </div>

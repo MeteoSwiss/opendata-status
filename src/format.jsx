@@ -2,7 +2,8 @@
 import React from 'react';
 import styles from './styles.module.css';
 
-export function fmtAge(min, t) {
+// ago: after «vor» (German dative: «vor 2 Tagen»)
+export function fmtAge(min, t, ago = false) {
   if (min === null || min === undefined || Number.isNaN(min)) return t.unit.noData;
   const m = Math.max(0, Math.round(min));
   if (m < 60) return `${m} ${t.unit.min}`;
@@ -11,7 +12,7 @@ export function fmtAge(min, t) {
     const r = m % 60;
     return `${h} ${t.unit.h}${r ? ` ${r} ${t.unit.min}` : ''}`;
   }
-  return `${Math.round(m / 1440)} ${t.unit.days}`;
+  return `${Math.round(m / 1440)} ${ago ? t.unit.daysAgo : t.unit.days}`;
 }
 
 export function fmtTime(date, t, withYear = false) {
@@ -19,6 +20,13 @@ export function fmtTime(date, t, withYear = false) {
   const o = {timeZone: 'Europe/Zurich', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'};
   if (withYear) o.year = 'numeric';
   return new Date(date).toLocaleString(t.intl, o);
+}
+
+// Time span; on the same day the date only once: «27.11., 04:38–11:14»
+export function fmtRange(start, end, t) {
+  const day = (d) => new Date(d).toLocaleDateString(t.intl, {timeZone: 'Europe/Zurich'});
+  if (end && day(start) === day(end)) return `${fmtTime(start, t)}–${fmtClock(end, t)}`;
+  return `${fmtTime(start, t)} – ${end ? fmtTime(end, t) : ''}`;
 }
 
 export function fmtClock(date, t) {

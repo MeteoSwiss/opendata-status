@@ -89,6 +89,11 @@ h1 { font-size: 32px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.01em
 @media (max-width: 996px) {
   .navbar__title { display: none; }
 }
+/* the title is in the header on wide screens: the page heading is only read out there */
+@media (min-width: 997px) {
+  .page-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+.navbar__title .beta { font-size: 13px; vertical-align: 0.5em; }
 @media (max-width: 650px) {
   .navbar { height: 3.75rem; padding: 0.5rem 0.5rem 0.5rem 0.75rem; }
   .navbar__logo { height: 2.75rem; margin-right: 0; }

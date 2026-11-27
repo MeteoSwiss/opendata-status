@@ -343,3 +343,6 @@
   .keyval { gap: 8px; }
   .figure { font-size: 13px; }
 }
+
+/* marks the real-time datasets (they count towards the 95 % target) */
+.tag { display: inline-block; margin-left: 8px; padding: 0 6px; border: 1px solid var(--m-line); border-radius: 3px; font-size: 12px; font-weight: 500; line-height: 18px; color: var(--m-muted); vertical-align: 1px; }

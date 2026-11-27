@@ -158,7 +158,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   };
   const rtOk = nOk(realtime);
   const monOk = nOk(monitored);
-  const problems = monitored.filter((r) => r.cls === 'warn' || r.cls === 'bad').length;
+  const knownMon = monitored.filter((r) => KNOWN.includes(r.cls));
   const rtCls = overall(realtime);
   const allCls = overall(monitored);
   // headline dot: a known problem comes first (real-time datasets as they are, others as delayed),
@@ -192,7 +192,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   const describe = (r) => {
     if (r.noAccess) return t.notDownloadable(r.noAccess.host, r.noAccess.error || `HTTP ${r.noAccess.http_status}`);
     if (r.c.metric === 'latency') return r.stalled ? `${t.noNewData}, ${t.latShort(fmtAge(r.value, t))}` : t.latShort(fmtAge(r.value, t));
-    return t.valAge(fmtAge(r.value, t));
+    return t.valAge(fmtAge(r.value, t, true));
   };
 
   const late = monitored.filter((r) => r.cls !== 'ok' && r.cls !== 'checking');
@@ -228,7 +228,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
   // one compact entry per dataset: title, key figure and status on one line, slim strip, details below
   const keyFigure = (r) => {
     if (r.c.monitoring_pending || r.value === null || r.value === undefined) return '–';
-    return r.c.metric === 'latency' ? t.valLat(fmtAge(r.value, t)) : t.valAge(fmtAge(r.value, t));
+    return r.c.metric === 'latency' ? t.valLat(fmtAge(r.value, t)) : t.valAge(fmtAge(r.value, t, true));
   };
   const renderItem = (r) => (
       <div key={r.c.key} id={`monitor-${r.c.key}`}
@@ -236,6 +236,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         <div className={styles.row}>
           <div className={styles.name}>
             {r.c.doc ? <a href={docUrl(r.c.doc, locale)}>{name(r.c)}</a> : name(r.c)}
+            {r.c.realtime && <span className={styles.tag}>{t.realtimeTag}</span>}
           </div>
           <div className={styles.keyval}>
             <span className={styles.figure}>{keyFigure(r)}</span>
@@ -253,11 +254,14 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
             + (r.m.run ? ` · ${r.m.run.complete ? t.allParams(r.m.run.expected) : t.someParams(r.m.run.files, r.m.run.expected)}` : '')
             + (r.stalled ? ` · ${t.noNewData}` : '')
             + (r.m.stations ? ` · ${t.stations(r.m.stations.ok, r.m.stations.total)}${r.m.stations.stale.length ? ` · ${t.staleList}${r.m.stations.stale.join(', ')}` : ''}` : '')
-          : t.metaAge(t.interval[r.c.interval], fmtTime(r.m.updated, t))
+          : t.metaAge(fmtAge(r.c.ok_max_min, t), t.interval[r.c.interval])
+            // the absolute time only where «published … ago» is long ago
+            + (r.value >= 1440 && r.m.updated ? ` · ${t.lastPub(fmtTime(r.m.updated, t))}` : '')
             + (r.m.modelRun ? ` · ${t.modelRun(fmtTime(r.m.modelRun, t))}` : ''))
           + (r.noAccess ? ` · ${t.notDownloadable(r.noAccess.host, r.noAccess.error || `HTTP ${r.noAccess.http_status}`)} (${t.check} ${fmtClock(r.noAccess.checked, t)})` : '')
           + (r.c.season ? ` · ${t.pauseInfo}` : '')
-          + (r.source === 'check' ? ` · ${t.fromCheck(fmtClock(r.at, t))}` : '')
+          // the source per dataset only where it differs from the headline (some live, this one not)
+          + (r.source === 'check' && liveAt ? ` · ${t.fromCheck(fmtClock(r.at, t))}` : '')
           + (r.cls === 'stale' && r.at ? ` · ${t.lastStatus(fmtTime(r.at, t))}` : ''))}</p>
       </div>
   );
@@ -301,7 +305,10 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         <span className={`${styles.bigdot} ${styles[dotCls]}`} aria-hidden="true" />
         <div>
           <p className={styles.hlTitle}>{title}</p>
-          <p className={styles.muted}>{t.lead(rtOk, realtime.length, asOf)}</p>
+          {/* without any current status, say why instead of «0 of 6» */}
+          {knownMon.length
+            ? <p className={styles.muted}>{t.lead(rtOk, realtime.length, asOf)}</p>
+            : !anyChecking && <p className={styles.muted}>{t.noCurrentLead}</p>}
         </div>
       </div>
 
@@ -314,7 +321,7 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
           ))}
         </div>
         <p className={`${styles.small} ${styles.greenMeans}`}>{t.greenMeans}</p>
-        {history && history.error && !lastCheck && <p className={styles.notice}>{t.historyMissing}</p>}
+        {history && history.error && !lastCheck && <p className={styles.notice}>{t.historyMissing(Boolean(liveAt))}</p>}
         {checkOverdue && <p className={styles.notice} role="status">{t.checkOverdue(fmtTime(lastCheck, t, true))}</p>}
         <div className={styles.bars}>
           {GROUPS.map((g) => {
@@ -344,7 +351,11 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
                       <small>{t.nSets(list.length)}</small>
                     </span>
                   </button>
-                  <span className={`${styles.status} ${styles[cls]}`}>{cls === 'ok' ? t.allCurrent : t.ofCurrent(ok, rated.length)}</span>
+                  <span className={`${styles.status} ${styles[cls]}`}>
+                    {cls === 'ok' ? t.allCurrent
+                      : !rated.some((r) => KNOWN.includes(r.cls)) ? t.status[cls === 'checking' ? 'checking' : 'stale']
+                        : t.ofCurrent(ok, rated.length)}
+                  </span>
                 </div>
                 <Strip checks={groupChecks(list)} end={now} firstEver={firstEver} t={t}
                   incidents={incidents.filter((x) => x.datasets.some((d) => list.some((r) => r.c.key === d.key)))} />
@@ -368,24 +379,14 @@ export default function OgdMonitor({locale = 'en', dataUrl = DEFAULT_DATA_URL, r
         <p className={styles.h2}>{t.keyFigures}</p>
         <div className={styles.stats}>
           <div className={styles.stat}>
-            <span className={styles.statLabel}>{t.kpiRt}</span>
-            <span className={`${styles.statValue} ${pctCls(realtime.length ? rtOk / realtime.length : null, 0.8)}`}>{fmtPct(realtime.length ? rtOk / realtime.length : null, t)}</span>
-            <span className={styles.small}>{t.kpiRtSub}</span>
-          </div>
-          <div className={styles.stat}>
             <span className={styles.statLabel}>{t.kpiAvg}</span>
             <span className={`${styles.statValue} ${pctCls(avg30, 0.8)}`}>{fmtPct(avg30, t)}</span>
             <span className={styles.small}>{t.kpiAvgSub(hist.summary.length)}</span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>{t.kpiAll}</span>
-            <span className={`${styles.statValue} ${pctCls(monitored.length ? monOk / monitored.length : null, 0)}`}>{fmtPct(monitored.length ? monOk / monitored.length : null, t)}</span>
-            <span className={styles.small}>{t.kpiAllSub(monOk, monitored.length)}</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statLabel}>{t.kpiBad}</span>
-            <span className={`${styles.statValue} ${problems ? styles.bad : styles.ok}`}>{problems}</span>
-            <span className={styles.small}>{t.kpiBadSub}</span>
+            <span className={`${styles.statValue} ${pctCls(knownMon.length ? monOk / monitored.length : null, 0)}`}>{fmtPct(knownMon.length ? monOk / monitored.length : null, t)}</span>
+            <span className={styles.small}>{knownMon.length ? t.kpiAllSub(monOk, monitored.length) : t.status.stale}</span>
           </div>
         </div>
       </div>

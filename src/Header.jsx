@@ -21,7 +21,7 @@ export default function Header({locale, locales, onLocale, docsUrl, sourceUrl, t
     <header className="navbar">
       <a className="navbar__brand" href="./" aria-label={t.home}>
         <img className="navbar__logo" src={`img/mch_logo_${locale}.png`} alt="MeteoSwiss - Logo" width="278" height="64" />
-        <b className="navbar__title">Open Data Status</b>
+        <b className="navbar__title">Open Data Status <span className="beta">Beta</span></b>
       </a>
       <nav className="navbar__items" aria-label={t.nav}>
         <a className="navbar__link navbar__extra" href={docsUrl}>{t.docs}</a>

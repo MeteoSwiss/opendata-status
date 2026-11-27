@@ -37,7 +37,8 @@ function App() {
     <>
       <Header locale={locale} locales={LOCALES} onLocale={choose} docsUrl={DOCS[locale]} sourceUrl={source} t={p} />
       <main className="page">
-        <h1>Open Data Status <span className="beta">Beta</span></h1>
+        {/* on wide screens the header carries the title; the heading stays for screen readers */}
+        <h1 className="page-title">Open Data Status <span className="beta">Beta</span></h1>
         <p className="intro">
           {p.intro} {p.status[0]}<a href={FSDI_STATUS}>{p.status[1]}</a>{p.status[2]}
         </p>
