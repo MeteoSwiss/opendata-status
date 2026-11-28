@@ -1,0 +1,423 @@
+[
+ {
+  "key": "smn",
+  "collection": "ch.meteoschweiz.ogd-smn",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-11-28T14:38:28Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 0.0,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "smn-klo",
+  "collection": "ch.meteoschweiz.ogd-smn",
+  "group": "A",
+  "metric": "latency",
+  "updated": null,
+  "ref_time": "2026-11-28T14:20:00Z",
+  "available": "2026-11-28T14:29:28Z",
+  "value_min": 9.5,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 200
+  }
+ },
+ {
+  "key": "smn-precip",
+  "collection": "ch.meteoschweiz.ogd-smn-precip",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-11-28T14:38:30Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 0.0,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "smn-precip-win",
+  "collection": "ch.meteoschweiz.ogd-smn-precip",
+  "group": "A",
+  "metric": "latency",
+  "updated": null,
+  "ref_time": "2026-11-28T14:10:00Z",
+  "available": "2026-11-28T14:29:02Z",
+  "value_min": 19.0,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 200
+  }
+ },
+ {
+  "key": "smn-tower",
+  "collection": "ch.meteoschweiz.ogd-smn-tower",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-11-28T14:38:22Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 0.1,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "nime",
+  "collection": "ch.meteoschweiz.ogd-nime",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-11-28T03:03:55Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 694.5,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "tot",
+  "collection": "ch.meteoschweiz.ogd-tot",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-06-30T04:01:17Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 218077.1,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "pollen",
+  "collection": "ch.meteoschweiz.ogd-pollen",
+  "group": "A",
+  "metric": "latency",
+  "updated": null,
+  "ref_time": "2026-11-28T14:00:00Z",
+  "available": "2026-11-28T14:17:09Z",
+  "value_min": 17.2,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "stations_total": 15,
+  "stations_ok": 14,
+  "stations_stale": [
+   "Payerne (PPY)"
+  ],
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 200
+  }
+ },
+ {
+  "key": "obs",
+  "collection": "ch.meteoschweiz.ogd-obs",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-11-28T03:03:41Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 694.7,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "phenology",
+  "collection": "ch.meteoschweiz.ogd-phenology",
+  "group": "A",
+  "metric": "age",
+  "updated": "2026-11-25T05:15:35Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 4882.8,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "nbcn",
+  "collection": "ch.meteoschweiz.ogd-nbcn",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-11-27T11:45:38Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 1612.8,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "nbcn-precip",
+  "collection": "ch.meteoschweiz.ogd-nbcn-precip",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-11-05T04:52:49Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 33705.6,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "surface-derived-grid",
+  "collection": "ch.meteoschweiz.ogd-surface-derived-grid",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-11-28T12:17:34Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 140.9,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "satellite-derived-grid",
+  "collection": "ch.meteoschweiz.ogd-satellite-derived-grid",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-11-28T12:20:56Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 137.5,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "radar-derived-grid",
+  "collection": "ch.meteoschweiz.ogd-radar-derived-grid",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-10-26T16:12:55Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 47425.5,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "climate-normals-grid",
+  "collection": "ch.meteoschweiz.ogd-climate-normals-grid",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-06-30T04:00:34Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": null,
+  "status": "static",
+  "checked": "2026-11-28T14:38:26Z"
+ },
+ {
+  "key": "climate-scenarios-ch2025",
+  "collection": "ch.meteoschweiz.ogd-climate-scenarios-ch2025",
+  "group": "C",
+  "metric": "age",
+  "updated": "2025-10-30T15:55:15Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": null,
+  "status": "static",
+  "checked": "2026-11-28T14:38:26Z"
+ },
+ {
+  "key": "climate-scenarios-ch2025-grid",
+  "collection": "ch.meteoschweiz.ogd-climate-scenarios-ch2025-grid",
+  "group": "C",
+  "metric": "age",
+  "updated": "2026-06-30T04:00:36Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": null,
+  "status": "static",
+  "checked": "2026-11-28T14:38:26Z"
+ },
+ {
+  "key": "radar-rzc",
+  "collection": "ch.meteoschweiz.ogd-radar-precip",
+  "group": "D",
+  "metric": "latency",
+  "updated": null,
+  "ref_time": "2026-11-28T14:35:00Z",
+  "available": "2026-11-28T14:36:04Z",
+  "value_min": 1.1,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "radar-cpc",
+  "collection": "ch.meteoschweiz.ogd-radar-precip",
+  "group": "D",
+  "metric": "latency",
+  "updated": null,
+  "ref_time": "2026-11-28T14:30:00Z",
+  "available": "2026-11-28T14:34:32Z",
+  "value_min": 4.5,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "radar-hail",
+  "collection": "ch.meteoschweiz.ogd-radar-hail",
+  "group": "D",
+  "metric": "age",
+  "updated": "2026-11-28T14:36:04Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 2.4,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "forecasting-icon-ch1",
+  "collection": "ch.meteoschweiz.ogd-forecasting-icon-ch1",
+  "group": "E",
+  "metric": "age",
+  "updated": "2026-11-28T13:53:13Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 45.2,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "model_run": "2026-11-28T12:00:00Z",
+  "access": {
+   "ok": true,
+   "host": "rgw.cscs.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "forecasting-icon-ch2",
+  "collection": "ch.meteoschweiz.ogd-forecasting-icon-ch2",
+  "group": "E",
+  "metric": "age",
+  "updated": "2026-11-28T14:39:15Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 0.0,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "model_run": "2026-11-28T12:00:00Z",
+  "access": {
+   "ok": true,
+   "host": "rgw.cscs.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "local-forecasting",
+  "collection": "ch.meteoschweiz.ogd-local-forecasting",
+  "group": "E",
+  "metric": "latency",
+  "updated": null,
+  "ref_time": "2026-11-28T14:00:00Z",
+  "available": "2026-11-28T14:05:00Z",
+  "value_min": 5.0,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "run_files": 32,
+  "run_files_expected": 32,
+  "run_complete": true,
+  "access": {
+   "ok": true,
+   "host": "data.geo.admin.ch",
+   "http_status": 206
+  }
+ },
+ {
+  "key": "analysis-kenda-ch1",
+  "collection": "ch.meteoschweiz.ogd-analysis-kenda-ch1",
+  "group": "E",
+  "metric": "age",
+  "updated": "2026-11-28T12:56:32Z",
+  "ref_time": null,
+  "available": null,
+  "value_min": 101.9,
+  "status": "ok",
+  "checked": "2026-11-28T14:38:26Z",
+  "model_run": "2026-11-28T11:00:00Z",
+  "access": {
+   "ok": true,
+   "host": "rgw.cscs.ch",
+   "http_status": 206
+  }
+ }
+]
